@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="960.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.planify.RegisterController">
+    <children>
+        <AnchorPane layoutX="76.0" layoutY="73.0" prefHeight="434.0" prefWidth="807.0" styleClass="anchor-pane">
+            <children>
+                <Label fx:id="loginLabel" layoutX="145.0" layoutY="50.0" styleClass="label label-underline" text="Login">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+                <Label fx:id="registerLabel" layoutX="555.0" layoutY="50.0" style="-fx-underline: true; -fx-text-fill: white;" text="Register">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+                <TextField fx:id="registerFirstNameField" layoutX="43.0" layoutY="177.0" prefHeight="26.0" prefWidth="278.0" promptText="FirstName" styleClass="text-field" />
+                <PasswordField fx:id="registerPasswordField" layoutX="470.0" layoutY="235.0" prefHeight="26.0" prefWidth="278.0" promptText="Password" styleClass="text-field" />
+                <TextField fx:id="registerEmailField" layoutX="43.0" layoutY="235.0" prefHeight="26.0" prefWidth="278.0" promptText="Email" styleClass="text-field" />
+                <ImageView fx:id="registerIconUserFirstname" fitHeight="26.0" fitWidth="25.0" layoutX="14.0" layoutY="177.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@images/iconUser.png" />
+                    </image>
+                </ImageView>
+                <ImageView fx:id="registerIconPassword" fitHeight="34.0" fitWidth="31.0" layoutX="749.0" layoutY="232.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@images/iconPassword.png" />
+                    </image>
+                </ImageView>
+                <ImageView fx:id="registerIconEmail" fitHeight="33.0" fitWidth="25.0" layoutX="14.0" layoutY="236.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@images/iconEmail.png" />
+                    </image>
+                </ImageView>
+                <Button fx:id="registerContinueButton" layoutX="320.0" layoutY="357.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="122.0" styleClass="button" text="Sign Up">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Button>
+                <TextField fx:id="registerLastNameField" layoutX="470.0" layoutY="175.0" prefHeight="26.0" prefWidth="278.0" promptText="LastName" styleClass="text-field" />
+                <ChoiceBox fx:id="registerChoiceBoxRole" layoutX="597.0" layoutY="285.0" prefWidth="150.0" styleClass="choice-box" stylesheets="@style.css" />
+                <Label fx:id="registerRoleLabel" layoutX="470.0" layoutY="289.0" styleClass="label" text="Choose your role:">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+                <RadioButton fx:id="registerRadioButtonMale" layoutX="43.0" layoutY="284.0" mnemonicParsing="false" styleClass="radio-button" text="Male" textFill="WHITE" />
+                <RadioButton fx:id="registerRadioButtonFemale" layoutX="241.0" layoutY="284.0" mnemonicParsing="false" styleClass="radio-button" text="Female" textFill="WHITE" />
+            <ImageView fx:id="registerIconUserLastname" fitHeight="26.0" fitWidth="25.0" layoutX="752.0" layoutY="176.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/iconUser.png" />
+               </image>
+            </ImageView>
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>

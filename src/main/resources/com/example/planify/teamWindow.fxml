@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="960.0" styleClass="anchor-pane-dashboard" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.planify.TeamController">
+    <children>
+        <AnchorPane fx:id="AnchorBackMenu" prefHeight="582.0" prefWidth="131.0" style="-fx-background-color: #61605e;">
+            <children>
+                <VBox fx:id="vboxAvatarNameEmail" prefHeight="46.0" prefWidth="200.0" styleClass="vbox-avatarAndLabels">
+                    <children>
+                        <Circle fx:id="circleBackAvatar" fill="DODGERBLUE" radius="44.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Label fx:id="dashboardNameLabel" text="Name">
+                            <font>
+                                <Font name="System Bold" size="15.0" />
+                            </font></Label>
+                        <Label fx:id="dashboardEmailLabel" alignment="TOP_CENTER" opacity="0.52" text="Email" textFill="WHITE">
+                            <font>
+                                <Font size="10.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox fx:id="vboxSignOut" layoutY="520.0" prefHeight="46.0" prefWidth="200.0" styleClass="vbox-avatarAndLabels">
+                    <children>
+
+                        <Label fx:id="dashboardLabenSignOut" alignment="TOP_CENTER" opacity="0.52" text="Sign out" textFill="WHITE">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox fx:id="vboxMenu" layoutY="201.0" prefHeight="242.0" prefWidth="200.0" styleClass="vbox-menu">
+                    <children>
+                        <Button fx:id="menuDashboard" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Dashboard" />
+                        <Button fx:id="menuProjects" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Projects" />
+                        <Button fx:id="menuTasks" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="201.0" styleClass="button-menu" text="Tasks" />
+                        <Button fx:id="menuTeam" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Team" />
+                        <Button fx:id="menuSettings" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Settings" />
+                    </children>
+                </VBox>
+            </children>
+        </AnchorPane>
+      <TableView fx:id="adminTableTeam" layoutX="246.0" layoutY="35.0" prefHeight="460.0" prefWidth="668.0">
+        <columns>
+          <TableColumn fx:id="columnName" prefWidth="213.59996032714844" text="Name" />
+          <TableColumn fx:id="columnRole" prefWidth="228.0" text="Role" />
+            <TableColumn fx:id="columnEmail" prefWidth="227.20001220703125" text="Email" />
+        </columns>
+      </TableView>
+      <Button fx:id="teamButtonAddUser" layoutX="500.0" layoutY="513.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="158.0" styleClass="button-new" stylesheets="@style.css" text="Add user" />
+      <Button fx:id="teamButtonRemoveUser" layoutX="725.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleRemoveUser" prefHeight="46.0" prefWidth="158.0" styleClass="button-delete" stylesheets="@style.css" text="Remove user" />
+      <Button fx:id="teamButtonJoinTeam" layoutX="500.0" layoutY="512.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="158.0" styleClass="button-new" stylesheets="@style.css" text="Join Team" />
+      <Button fx:id="teamButtonLeaveTeam" layoutX="725.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleRemoveUser" prefHeight="46.0" prefWidth="158.0" styleClass="button-delete" stylesheets="@style.css" text="Leave Team" />
+      <Label fx:id="teamName" layoutX="246.0" layoutY="526.0" text="Team Name:" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="teamIdResultat" layoutX="341.0" layoutY="526.0" text="Noname" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="960.0" styleClass="anchor-pane-dashboard" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.planify.TasksController">
+    <children>
+        <AnchorPane fx:id="AnchorBackMenu" prefHeight="582.0" prefWidth="131.0" style="-fx-background-color: #61605e;">
+            <children>
+                <VBox fx:id="vboxAvatarNameEmail" prefHeight="46.0" prefWidth="200.0" styleClass="vbox-avatarAndLabels">
+                    <children>
+                        <Circle fx:id="circleBackAvatar" fill="DODGERBLUE" radius="44.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Label fx:id="dashboardNameLabel" text="Name">
+                            <font>
+                                <Font name="System Bold" size="15.0" />
+                            </font></Label>
+                        <Label fx:id="dashboardEmailLabel" alignment="TOP_CENTER" opacity="0.52" text="Email" textFill="WHITE">
+                            <font>
+                                <Font size="10.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox fx:id="vboxSignOut" layoutY="520.0" prefHeight="46.0" prefWidth="200.0" styleClass="vbox-avatarAndLabels">
+                    <children>
+
+                        <Label fx:id="dashboardLabenSignOut" alignment="TOP_CENTER" opacity="0.52" text="Sign out" textFill="WHITE">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox fx:id="vboxMenu" layoutY="201.0" prefHeight="242.0" prefWidth="200.0" styleClass="vbox-menu">
+                    <children>
+                        <Button fx:id="menuDashboard" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Dashboard" />
+                        <Button fx:id="menuProjects" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Projects" />
+                        <Button fx:id="menuTasks" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="201.0" styleClass="button-menu" text="Tasks" />
+                        <Button fx:id="menuTeam" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Team" />
+                        <Button fx:id="menuSettings" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Settings" />
+                    </children>
+                </VBox>
+            </children>
+        </AnchorPane>
+      <HBox fx:id="tasksHboxBack" layoutX="255.0" layoutY="41.0" prefHeight="472.0" prefWidth="655.0">
+         <children>
+            <VBox fx:id="tasksToDoVbox" prefHeight="472.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15;">
+               <children>
+                  <Label fx:id="tittelToDo" prefHeight="18.0" prefWidth="262.0" style="-fx-background-color: skyblue;" styleClass="tasks-header" text="To Do">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <ListView fx:id="tasksToDoListViewBack" prefHeight="453.0" prefWidth="218.0" styleClass="dashboard-tasks-list" />
+               </children>
+            </VBox>
+            <VBox fx:id="tasksInProgressVbox" layoutX="10.0" layoutY="10.0" prefHeight="472.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15;">
+               <children>
+                  <Label fx:id="tittelInProgress" prefHeight="18.0" prefWidth="262.0" style="-fx-background-color: orange;" styleClass="tasks-header" text="In Progress">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <ListView fx:id="tasksInProgressListViewBack" prefHeight="435.0" prefWidth="218.0" styleClass="dashboard-tasks-list" />
+               </children>
+            </VBox>
+            <VBox fx:id="tasksCompletedVbox" layoutX="230.0" layoutY="10.0" prefHeight="472.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15;">
+               <children>
+                  <Label fx:id="tittelCompleted" prefHeight="18.0" prefWidth="262.0" style="-fx-background-color: #38ba2d;" styleClass="tasks-header" text="Completed">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <ListView fx:id="tasksCompletedListViewBack" prefHeight="436.0" prefWidth="219.0" styleClass="dashboard-tasks-list" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Button fx:id="ButtonCreateTask" layoutX="678.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="button-new" stylesheets="@style.css" text="Create" />
+      <Button fx:id="ButtonDeleteTask" layoutX="559.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="button-delete" stylesheets="@style.css" text="Delete" />
+      <Button fx:id="ButtonEditTask" layoutX="798.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="button-edit" stylesheets="@style.css" text="Edit" />
+      <Label fx:id="tasksProjectChooseLabel" layoutX="255.0" layoutY="538.0" styleClass="label" text="Choose a project:">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="tasksChoiceBoxProject" layoutX="375.0" layoutY="534.0" prefHeight="20.0" prefWidth="125.0" styleClass="choice-box" stylesheets="@style.css" />
+    </children>
+</AnchorPane>

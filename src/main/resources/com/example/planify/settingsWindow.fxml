@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="960.0" styleClass="anchor-pane-dashboard" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.planify.SettingsController">
+    <children>
+        <AnchorPane fx:id="AnchorBackMenu" prefHeight="582.0" prefWidth="131.0" style="-fx-background-color: #61605e;">
+            <children>
+                <VBox fx:id="vboxAvatarNameEmail" prefHeight="46.0" prefWidth="200.0" styleClass="vbox-avatarAndLabels">
+                    <children>
+                        <Circle fx:id="circleBackAvatar" fill="DODGERBLUE" radius="44.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Label fx:id="dashboardNameLabel" text="Name">
+                            <font>
+                                <Font name="System Bold" size="15.0" />
+                            </font></Label>
+                        <Label fx:id="dashboardEmailLabel" alignment="TOP_CENTER" opacity="0.52" text="Email" textFill="WHITE">
+                            <font>
+                                <Font size="10.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox fx:id="vboxSignOut" layoutY="520.0" prefHeight="46.0" prefWidth="200.0" styleClass="vbox-avatarAndLabels">
+                    <children>
+
+                        <Label fx:id="dashboardLabenSignOut" alignment="TOP_CENTER" opacity="0.52" text="Sign out" textFill="WHITE">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox fx:id="vboxMenu" layoutY="201.0" prefHeight="242.0" prefWidth="200.0" styleClass="vbox-menu">
+                    <children>
+                        <Button fx:id="menuDashboard" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Dashboard" />
+                        <Button fx:id="menuProjects" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Projects" />
+                        <Button fx:id="menuTasks" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="201.0" styleClass="button-menu" text="Tasks" />
+                        <Button fx:id="menuTeam" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Team" />
+                        <Button fx:id="menuSettings" mnemonicParsing="false" onAction="#handleMenuClick" prefHeight="46.0" prefWidth="203.0" styleClass="button-menu" text="Settings" />
+                    </children>
+                </VBox>
+            </children>
+        </AnchorPane>
+      <VBox fx:id="settingsVboxBack" alignment="CENTER" layoutX="200.0" prefHeight="582.0" prefWidth="762.0" spacing="20.0">
+         <children>
+            <Label fx:id="ProfileSettingsTittle" alignment="BOTTOM_CENTER" prefHeight="36.0" prefWidth="632.0" text="Profile settings" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="25.0" />
+               </font>
+            </Label>
+            <VBox fx:id="PersonalDetailsVbox" prefHeight="178.0" prefWidth="620.0" spacing="10.0">
+               <children>
+                  <Label fx:id="PersonalDetailsTittle" prefHeight="18.0" prefWidth="778.0" text="Personal details" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="662.0">
+                     <children>
+                        <Label fx:id="FirstNameLabel" prefHeight="30.0" prefWidth="205.0" text="First name" textFill="WHITE">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="FirstNameInput" prefHeight="16.0" prefWidth="356.0" styleClass="text-input-profile" stylesheets="@style.css">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="40.0" prefHeight="40.0" prefWidth="662.0">
+                     <children>
+                        <Label fx:id="LastNameLabel" prefHeight="30.0" prefWidth="205.0" text="Last name" textFill="WHITE">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="LastNameInput" prefHeight="16.0" prefWidth="356.0" styleClass="text-input-profile" stylesheets="@style.css">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="80.0" prefHeight="40.0" prefWidth="662.0">
+                     <children>
+                        <Label fx:id="RoleLabel" prefHeight="30.0" prefWidth="205.0" text="Role" textFill="WHITE">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <ChoiceBox fx:id="ChoiceBoxRole" prefHeight="29.0" prefWidth="356.0" styleClass="choice-box-profile" stylesheets="@style.css" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox fx:id="ContactDetailsVbox" layoutX="60.0" layoutY="96.0" prefHeight="200.0" prefWidth="662.0" spacing="10.0">
+               <children>
+                  <Label fx:id="ContactDetailsTittle" prefHeight="18.0" prefWidth="662.0" text="Contact details" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="662.0">
+                     <children>
+                        <Label fx:id="PhoneLabel" prefHeight="30.0" prefWidth="205.0" text="Phone" textFill="WHITE">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="PhoneInput" prefHeight="16.0" prefWidth="356.0" styleClass="text-input-profile" stylesheets="@style.css">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="40.0" prefHeight="40.0" prefWidth="662.0">
+                     <children>
+                        <Label fx:id="EmailLabel" prefHeight="30.0" prefWidth="205.0" text="Email" textFill="WHITE">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="EmailInput" prefHeight="16.0" prefWidth="356.0" styleClass="text-input-profile" stylesheets="@style.css">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="80.0" prefHeight="40.0" prefWidth="662.0">
+                     <children>
+                        <Label fx:id="AddressLabel" prefHeight="30.0" prefWidth="205.0" text="Address" textFill="WHITE">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="AddressInput" prefHeight="16.0" prefWidth="356.0" styleClass="text-input-profile" stylesheets="@style.css">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <HBox prefHeight="66.0" prefWidth="662.0" spacing="50.0">
+               <children>
+                  <Button fx:id="ButtonSave" alignment="CENTER" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="button-new" stylesheets="@style.css" text="Save changes" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="ButtonChangePass" alignment="CENTER" layoutX="60.0" layoutY="10.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="button-edit" stylesheets="@style.css" text="Change password" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="ButtonDeleteAccount" alignment="CENTER" layoutX="60.0" layoutY="10.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="button-delete" stylesheets="@style.css" text="Delete account" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets left="50.0" right="50.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+         </padding>
+      </VBox>
+    </children>
+</AnchorPane>

@@ -1,0 +1,301 @@
+/* Логин, Регистрация - задний фон форм */
+.anchor-pane {
+    -fx-background-color: #5a4db3;
+    -fx-background-radius: 20;
+}
+
+/* Главная - задний фон*/
+.anchor-pane-dashboard {
+    -fx-background-color: #3A2F5B;
+    -fx-background-radius: 0;
+}
+
+/* Надписи в приложении*/
+.label {
+    -fx-text-fill: white;
+}
+
+/* Подчеркнутые надписи*/
+.label-underline {
+    -fx-underline: true;
+}
+
+/* Поля ввода*/
+.text-field {
+    -fx-background-color: white;
+    -fx-padding: 0 0 0 10; /* Отступ слева для полей ввода */
+}
+
+/* Иконки*/
+.icon {
+    -fx-padding: 0 10 0 0; /* Отступ справа для иконок */
+}
+
+/* Логин, Регистрация - кнопки*/
+.button {
+    -fx-background-radius: 10;
+}
+
+/* Регистрация, выбор роли - фокус с подстветкой*/
+.choice-box .menu-item:focused {
+    -fx-background-color: lightgray;
+}
+
+/* Регистрация - цвет выбранной роли*/
+.choice-box .label {
+    -fx-text-fill: black;
+}
+
+/* Регистрация - цвет отметок пола*/
+.radio-button {
+    -fx-text-fill: white;
+}
+
+/* Фото + Имя + Почта */
+.vbox-avatarAndLabels {
+    -fx-background-color: #61605e;
+    -fx-alignment: center;
+    -fx-padding: 20;
+}
+
+/* Меню секция*/
+.vbox-menu {
+    -fx-background-color: #61605e;
+    -fx-alignment: center;
+}
+
+/* Меню кнопки*/
+.button-menu {
+    -fx-background-color: #61605e;
+    -fx-border-radius: 15px 0px 0px 15px;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* Наведение на кнопки меню*/
+.button-menu:hover {
+    -fx-background-color: #61605e; /* Цвет активной кнопки */
+    -fx-border-radius: 15px; /* Скругление по всем углам */
+    -fx-border-color: rgba(200, 200, 200, 0.4); /* Серый с небольшой прозрачностью */
+    -fx-border-width: 1px; /* Толщина границы для четкости */
+}
+
+/* Выбранная кнопка меню*/
+.button-menu-active {
+    -fx-background-color: #61605e; /* Цвет активной кнопки */
+        -fx-border-radius: 15px; /* Скругление по всем углам */
+        -fx-border-color: white;
+        -fx-border-width: 2px; /* Толщина границы для четкости */
+        -fx-text-fill: white;
+        -fx-font-size: 14px;
+}
+
+/* Dashboard - надписи на левой части блоков*/
+.label-left {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+}
+
+/* Dashboard - надписи на правой части блоков*/
+.label-right {
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+    -fx-alignment: center;
+}
+
+/* Dashboard - блок списка проектов и заданий*/
+.dashboard-tasks-list {
+    -fx-background-color: white; /* Убираем стандартный фон */
+    -fx-background-radius: 0 0 15 15; /* Закругление только у контейнера */
+    -fx-background-insets: 0; /* Убирает дополнительную границу при фокусе */
+    -fx-padding: 0;
+}
+
+/* Dashboard - ячейки списка заданий*/
+.dashboard-tasks-list .list-cell {
+    -fx-background-color: transparent; /* Прозрачный фон ячеек */
+    -fx-border-color: transparent;     /* Убираем возможные границы */
+    -fx-padding: 0 10; /* Добавляем немного отступов по бокам */
+}
+
+/* Dashboard - выделенная ячейка списки заданий*/
+.dashboard-tasks-list .list-cell:filled:selected {
+    -fx-background-color: #333333; /* Темно-серый фон */
+    -fx-border-color: transparent;     /* Убираем возможные границы */
+    -fx-background-radius: 15;    /* Скругленные углы */
+}
+
+/* Dashboard - вертикальный скроллбар */
+.dashboard-tasks-list .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px; /* Уже scrollbar — больше места содержимому */
+    -fx-padding: 0 2 2 0; /* Чтобы scrollbar не упирался в угол */
+}
+
+/* Dashboard - ползунок (thumb) скроллбара */
+.dashboard-tasks-list .scroll-bar:vertical .thumb {
+    -fx-background-color: #bbbbbb;
+    -fx-background-radius: 5px;
+}
+
+/* Dashboard - трек скроллбара */
+.dashboard-tasks-list .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 0 15 15; /* Скругление внизу */
+}
+
+/* Dashboard - заголовки блоков*/
+.table-header {
+    -fx-text-fill: white;          /* Белый текст */
+    -fx-font-weight: bold;         /* Жирный текст */
+    -fx-font-size: 16px;           /* Увеличенный шрифт */
+    -fx-alignment: CENTER;         /* Выравнивание текста по центру */
+    -fx-padding: 5 0 5 0;         /* Равномерные отступы сверху и снизу */
+}
+
+/* Team - основная таблица */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+}
+
+/* Стиль фона заголовков столбцов */
+.table-view .column-header-background {
+    -fx-background-color: #61605e;
+    -fx-background-radius: 15px 15px 0px 0px;
+}
+
+/* Стиль текста заголовков столбцов */
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}
+
+/* Стиль ячеек таблицы */
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+/* Стиль четных строк таблицы */
+.table-row-cell:odd {
+    -fx-background-color: #f5f5f5;
+}
+
+/* Стиль выбранной строки */
+.table-row-cell:selected {
+    -fx-background-color: #b3b3b3;
+    -fx-text-fill: black;
+}
+
+/* Стиль таблицы при фокусе */
+.table-view:focused {
+    -fx-background-insets: 0;
+}
+
+/* Центрирование содержимого столбцов */
+.table-view .table-column {
+    -fx-alignment: CENTER;
+}
+
+/* Центрирование содержимого ячеек */
+.table-view .table-cell {
+    -fx-alignment: CENTER;
+}
+
+/* Убирает внутренние отступы в виртуальном потоке */
+.table-view .virtual-flow {
+    -fx-padding: 0;
+}
+
+/* Делает полосы прокрутки невидимыми */
+.table-view .scroll-bar:vertical,
+.table-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+}
+
+/* Projects - стиль кнопки New */
+.button-new {
+    -fx-background-color: #89c248; /* Мягкий зеленый цвет */
+    -fx-text-fill: black; /* Белый текст */
+    -fx-font-size: 12px; /* Размер шрифта */
+}
+
+.button-new:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.button-new:pressed {
+    -fx-background-color: #4d6e29; /* Еще темнее при нажатии */
+}
+
+
+/* Projects - стиль кнопки Delete */
+.button-delete {
+    -fx-background-color: #e64a32;
+    -fx-text-fill: black; /* Белый текст */
+    -fx-font-size: 12px; /* Размер шрифта */
+}
+
+.button-delete:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.button-delete:pressed {
+    -fx-background-color: #822e22; /* Еще темнее при нажатии */
+}
+
+/* Projects - стиль кнопки Edit */
+.button-edit {
+    -fx-background-color: #ffcc00;
+    -fx-text-fill: black; /* Белый текст */
+    -fx-font-size: 12px; /* Размер шрифта */
+}
+
+.button-edit:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.button-edit:pressed {
+    -fx-background-color: #cc9900; /* Еще темнее при нажатии */
+}
+
+/* Tasks - стиль заголовков Planned, In Progress, Completed */
+.tasks-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+    -fx-padding: 10;
+    -fx-max-width: Infinity;
+    -fx-background-radius: 15;
+}
+
+/* Стиль полей ввода, Profile Settings */
+.text-input-profile
+{
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: gray;
+    -fx-text-fill: white;
+}
+
+/* Стиль выбора роли, Profile Settings */
+.choice-box-profile {
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: gray;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+}
+
+.choice-box-profile .label {
+    -fx-text-fill: white;
+}
+

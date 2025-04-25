@@ -18,7 +18,8 @@ public class DatabaseHandler extends Configuration{
                         + dbHost + ":"
                             + dbPort + "/" + dbName;
 
-                Class.forName("com.mysql.jdbc.Driver");
+                //Class.forName("com.mysql.jdbc.Driver");
+
 
                 dbConnection = DriverManager.getConnection(connectionString,
                         dbUser, dbPass);

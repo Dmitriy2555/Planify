@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.jar</jar>
+  <outfile>C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\potap\Downloads\appIcon.ico</icon>
+  <singleInstance>
+    <mutexName>Planify herunterladen</mutexName>
+    <windowTitle></windowTitle>
+  </singleInstance>
+  <jre>
+    <path>C:\Users\potap\.jdks\corretto-24/bin</path>
+    <requiresJdk>true</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion>17</minVersion>
+    <maxVersion>24</maxVersion>
+    <opt>--module-path &quot;C:\Users\potap\Documents\javafx-sdk-23.0.2\lib&quot; --add-modules=javafx.controls,javafx.fxml</opt>
+  </jre>
+</launch4jConfig>

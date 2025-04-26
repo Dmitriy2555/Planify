@@ -1,0 +1,104 @@
+
+
+Version:	3.50
+CmdLine:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Create mutex:	Planify herunterladen
+Working dir:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\.
+Requires JDK:	Yes
+Requires 64-Bit: No
+Java min ver:	1.017.000
+Java max ver:	1.024.000
+JRE paths:	C:\Users\potap\.jdks\corretto-24\bin
+Check launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe (OK)
+Check javac:	C:\Users\potap\.jdks\corretto-24\bin\javac.exe (OK)
+Version string: 1.024.000 / 64-Bit (OK)
+Main class:	com.example.planify.Main
+Info:		Classpath not defined.
+Launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe" com.example.planify.Main
+Args length:	122/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Create mutex:	Planify herunterladen
+Working dir:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\.
+Requires JDK:	Yes
+Requires 64-Bit: No
+Java min ver:	1.017.000
+Java max ver:	1.024.000
+JRE paths:	C:\Users\potap\.jdks\corretto-24\bin
+Check launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe (OK)
+Check javac:	C:\Users\potap\.jdks\corretto-24\bin\javac.exe (OK)
+Version string: 1.024.000 / 64-Bit (OK)
+Main class:	com.example.planify.Main
+Info:		Classpath not defined.
+Launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe" com.example.planify.Main
+Args length:	122/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Create mutex:	Planify herunterladen
+Working dir:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\.
+Requires JDK:	Yes
+Requires 64-Bit: No
+Java min ver:	1.017.000
+Java max ver:	1.024.000
+JRE paths:	C:\Users\potap\.jdks\corretto-24
+Check launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe (OK)
+Check javac:	C:\Users\potap\.jdks\corretto-24\bin\javac.exe (OK)
+Version string: 1.024.000 / 64-Bit (OK)
+Launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe
+Launcher args:	-jar "C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe"
+Args length:	91/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Create mutex:	Planify herunterladen
+Working dir:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\.
+Requires JDK:	Yes
+Requires 64-Bit: No
+Java min ver:	1.017.000
+Java max ver:	1.024.000
+JRE paths:	C:\Users\potap\.jdks\corretto-24\bin
+Check launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe (OK)
+Check javac:	C:\Users\potap\.jdks\corretto-24\bin\javac.exe (OK)
+Version string: 1.024.000 / 64-Bit (OK)
+Launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe
+Launcher args:	--module-path "C:\Users\potap\Documents\javafx-sdk-23.0.2\lib" --add-modules=javafx.controls,javafx.fxml -jar "C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe"
+Args length:	196/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Create mutex:	Planify herunterladen
+Working dir:	C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\.
+Requires JDK:	Yes
+Requires 64-Bit: No
+Java min ver:	1.017.000
+Java max ver:	1.024.000
+JRE paths:	C:\Users\potap\.jdks\corretto-24\bin
+Check launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe (OK)
+Check javac:	C:\Users\potap\.jdks\corretto-24\bin\javac.exe (OK)
+Version string: 1.024.000 / 64-Bit (OK)
+Launcher:	C:\Users\potap\.jdks\corretto-24\bin\javaw.exe
+Launcher args:	--module-path "C:\Users\potap\Documents\javafx-sdk-23.0.2\lib" --add-modules=javafx.controls,javafx.fxml -jar "C:\Users\potap\Desktop\Дипломна Робота\planify\out\artifacts\planify_jar\planify.exe"
+Args length:	196/32768 chars
+Exit code:	0

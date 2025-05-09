@@ -117,10 +117,14 @@ public class RegisterController {
         boolean isValid = validateFields(firstName, lastName, userEmail, userPassword);
 
         if (isValid && dbHandler.isEmailExists(userEmail)) {
-            showEmailErrorTooltip();
+            showEmailErrorTooltip("This email already used");
             isValid = false;
         }
-
+        if (!userEmail.contains("@") || !userEmail.contains("."))
+        {
+            showEmailErrorTooltip("Invalid email address");
+            isValid = false;
+        }
         if (isValid) {
             User user = new User(firstName, lastName, userEmail, userPassword, userGender, userRole);
             dbHandler.signUpUser(user);
@@ -161,10 +165,10 @@ public class RegisterController {
     /**
      * Показывает сообщение об ошибке, если email уже используется.
      */
-    private void showEmailErrorTooltip() {
+    private void showEmailErrorTooltip(String warnung) {
         registerEmailField.setStyle("-fx-border-color: red;");
 
-        Tooltip tooltip = new Tooltip("Этот email уже используется!");
+        Tooltip tooltip = new Tooltip(warnung);
         tooltip.setShowDelay(Duration.ZERO);
         tooltip.setStyle("-fx-background-color: #ffcccc; -fx-text-fill: red;");
 

@@ -55,10 +55,10 @@
             <TableColumn fx:id="columnEmail" prefWidth="227.20001220703125" text="Email" />
         </columns>
       </TableView>
-      <Button fx:id="teamButtonAddUser" layoutX="500.0" layoutY="513.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="158.0" styleClass="button-new" stylesheets="@style.css" text="Add user" />
-      <Button fx:id="teamButtonRemoveUser" layoutX="725.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleRemoveUser" prefHeight="46.0" prefWidth="158.0" styleClass="button-delete" stylesheets="@style.css" text="Remove user" />
-      <Button fx:id="teamButtonJoinTeam" layoutX="500.0" layoutY="512.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="158.0" styleClass="button-new" stylesheets="@style.css" text="Join Team" />
-      <Button fx:id="teamButtonLeaveTeam" layoutX="725.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleRemoveUser" prefHeight="46.0" prefWidth="158.0" styleClass="button-delete" stylesheets="@style.css" text="Leave Team" />
+      <Button fx:id="teamButtonAddUser" layoutX="500.0" layoutY="513.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="158.0" styleClass="neon-save-button" stylesheets="@style.css" text="Add user" />
+      <Button fx:id="teamButtonRemoveUser" layoutX="725.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleRemoveUser" prefHeight="46.0" prefWidth="158.0" styleClass="neon-delete-button" stylesheets="@style.css" text="Remove user" />
+      <Button fx:id="teamButtonJoinTeam" layoutX="500.0" layoutY="512.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="158.0" styleClass="neon-save-button" stylesheets="@style.css" text="Join Team" />
+      <Button fx:id="teamButtonLeaveTeam" layoutX="725.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleRemoveUser" prefHeight="46.0" prefWidth="158.0" styleClass="neon-delete-button" stylesheets="@style.css" text="Leave Team" />
       <Label fx:id="teamName" layoutX="246.0" layoutY="526.0" text="Team Name:" textFill="WHITE">
          <font>
             <Font name="System Bold" size="15.0" />

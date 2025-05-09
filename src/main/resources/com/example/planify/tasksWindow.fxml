@@ -83,9 +83,9 @@
             </VBox>
          </children>
       </HBox>
-      <Button fx:id="ButtonCreateTask" layoutX="678.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="button-new" stylesheets="@style.css" text="Create" />
-      <Button fx:id="ButtonDeleteTask" layoutX="559.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="button-delete" stylesheets="@style.css" text="Delete" />
-      <Button fx:id="ButtonEditTask" layoutX="798.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="button-edit" stylesheets="@style.css" text="Edit" />
+      <Button fx:id="ButtonCreateTask" layoutX="678.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-save-button" stylesheets="@style.css" text="Create" />
+      <Button fx:id="ButtonDeleteTask" layoutX="559.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-delete-button" stylesheets="@style.css" text="Delete" />
+      <Button fx:id="ButtonEditTask" layoutX="798.0" layoutY="530.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-edit-button" stylesheets="@style.css" text="Edit" />
       <Label fx:id="tasksProjectChooseLabel" layoutX="255.0" layoutY="538.0" styleClass="label" text="Choose a project:">
          <font>
             <Font name="System Bold" size="14.0" />

@@ -57,8 +57,8 @@
                         <Font name="System Bold" size="19.0" />
                     </font>
                 </Label>
-            <Button fx:id="editProjectButton" layoutX="8.0" layoutY="5.0" minWidth="42.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="42.0" styleClass="button-edit" text="edit" />
-            <Button fx:id="deleteProjectButton" layoutX="222.0" layoutY="5.0" minWidth="42.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="70.0" styleClass="button-delete" text="delete" />
+            <Button fx:id="editProjectButton" layoutX="8.0" layoutY="5.0" minWidth="42.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="42.0" styleClass="project-edit-button" stylesheets="@style.css" text="edit" />
+            <Button fx:id="deleteProjectButton" layoutX="222.0" layoutY="5.0" minWidth="42.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="70.0" styleClass="project-delete-button" stylesheets="@style.css" text="delete" />
             </children>
         </AnchorPane>
         <AnchorPane fx:id="backgroundTasks" layoutX="613.0" layoutY="322.0" prefHeight="222.0" prefWidth="299.0" style="-fx-background-color: #61605e; -fx-background-radius: 20;">
@@ -79,7 +79,7 @@
                     </font>
                 </Label>
                 <ListView fx:id="projectsProjectsList" layoutY="34.0" prefHeight="464.0" prefWidth="299.0" styleClass="dashboard-tasks-list" />
-            <Button fx:id="newProjectButton" layoutX="235.0" layoutY="5.0" minWidth="42.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="42.0" styleClass="button-new" text="new" />
+            <Button fx:id="newProjectButton" layoutX="240.0" layoutY="5.0" minWidth="42.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="42.0" styleClass="project-add-button" stylesheets="@style.css" text="new" />
             </children>
         </AnchorPane>
         <AnchorPane fx:id="AnchorBackMenu" prefHeight="582.0" prefWidth="131.0" style="-fx-background-color: #61605e;">

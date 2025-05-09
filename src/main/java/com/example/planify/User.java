@@ -1,5 +1,9 @@
 package com.example.planify;
 
+/**
+ * Represents a user in the Planify application.
+ * Each user has attributes such as userId, firstName, lastName, userEmail, userPassword, userGender, and userRole.
+ */
 public class User {
     private int userId;
     private String firstName;

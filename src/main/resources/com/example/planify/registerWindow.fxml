@@ -11,11 +11,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="960.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.planify.RegisterController">
+<AnchorPane fx:id="registerBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="960.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.planify.RegisterController">
     <children>
         <AnchorPane layoutX="76.0" layoutY="73.0" prefHeight="434.0" prefWidth="807.0" styleClass="anchor-pane">
             <children>
-                <Label fx:id="loginLabel" layoutX="145.0" layoutY="50.0" styleClass="label label-underline" text="Login">
+                <Label fx:id="loginLabel" layoutX="145.0" layoutY="50.0" text="Login">
                     <font>
                         <Font name="System Bold" size="28.0" />
                     </font>
@@ -43,7 +43,7 @@
                         <Image url="@images/iconEmail.png" />
                     </image>
                 </ImageView>
-                <Button fx:id="registerContinueButton" layoutX="320.0" layoutY="357.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="122.0" styleClass="button" text="Sign Up">
+                <Button fx:id="registerContinueButton" layoutX="320.0" layoutY="357.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="122.0" styleClass="neon-button" stylesheets="@style.css" text="Sign Up">
                     <font>
                         <Font name="System Bold" size="16.0" />
                     </font>

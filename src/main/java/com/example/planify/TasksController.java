@@ -256,6 +256,7 @@ public class TasksController {
                 String selectedProject = projectChoiceBox.getValue();
                 LocalDate deadline = deadlinePicker.getValue();
                 String assigneeName = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ? assigneeChoiceBox.getValue() : currentUser.getFirstName() + " " + currentUser.getLastName();
+                String assigneeFirstName = currentUser.getFirstName();
 
                 if (taskName.isEmpty() || selectedProject == null || deadline == null) {
                     showAlertOneButton("All fields are required.");
@@ -288,6 +289,11 @@ public class TasksController {
                     showSuccessAlert("Task created successfully.");
                     VBox taskBlock = createTaskBlock(taskName, deadline, assigneeName);
                     addTaskBlockToColumn(taskBlock, "To Do"); // Добавляем в VBox "To Do"
+
+                    //Отправка сообщения пользователю на почту
+                    EmailSender emailSender = new EmailSender();
+                    String emailAssignee = new DatabaseHandler().getUserEmailById(assigneeId);
+                    emailSender.EmailSend(emailAssignee, assigneeFirstName, "You have a new task!\nTo do: " + taskName + "\nDeadline: " + deadline);
                 } else {
                     showAlertOneButton("Failed to create task.");
                 }

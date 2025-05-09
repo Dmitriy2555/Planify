@@ -1,28 +1,29 @@
 package com.example.planify;
 
 /**
- * Класс Session реализует паттерн Singleton для хранения информации
- * о текущем авторизованном пользователе в приложении.
+ * The Session class implements the Singleton pattern to store information
+ * about the currently authenticated user in the application.
  */
 public class Session {
-    // Единственный экземпляр класса
+    // The single instance of the class
     private static Session instance;
 
-    // Поле для хранения информации о текущем пользователе
+    // Field to store information about the current user
     private User loggedInUser;
 
-    //Последний открытый проект
+    // The last opened project
     private String lastOpenedProject;
+
     /**
-     * Приватный конструктор предотвращает создание экземпляров класса извне.
+     * Private constructor to prevent instantiation from outside the class.
      */
     private Session() {}
 
     /**
-     * Метод для получения единственного экземпляра класса.
-     * Реализует потокобезопасный доступ к объекту.
+     * Method to get the single instance of the class.
+     * Implements thread-safe access to the object.
      *
-     * @return экземпляр класса Session
+     * @return the instance of the Session class
      */
     public static synchronized Session getInstance() {
         if (instance == null) {
@@ -32,35 +33,44 @@ public class Session {
     }
 
     /**
-     * Возвращает текущего авторизованного пользователя.
+     * Returns the currently authenticated user.
      *
-     * @return объект User, представляющий текущего пользователя, или null, если пользователь не авторизован.
+     * @return the User object representing the current user, or null if no user is authenticated
      */
     public User getLoggedInUser() {
         return loggedInUser;
     }
 
     /**
-     * Устанавливает пользователя как текущего авторизованного.
+     * Sets the user as the currently authenticated user.
      *
-     * @param user объект User, представляющий авторизованного пользователя.
+     * @param user the User object representing the authenticated user
      */
     public void setLoggedInUser(User user) {
         this.loggedInUser = user;
     }
 
     /**
-     * Очищает информацию о текущем пользователе (выход из системы).
+     * Clears the information about the current user (logout).
      */
     public void clearSession() {
         loggedInUser = null;
     }
 
-    //последний открытый проект(страница задании)
+    /**
+     * Sets the name of the last opened project.
+     *
+     * @param projectName the name of the last opened project
+     */
     public void setLastOpenedProject(String projectName) {
         this.lastOpenedProject = projectName;
     }
 
+    /**
+     * Returns the name of the last opened project.
+     *
+     * @return the name of the last opened project
+     */
     public String getLastOpenedProject() {
         return lastOpenedProject;
     }

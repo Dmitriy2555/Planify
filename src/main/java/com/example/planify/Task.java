@@ -2,6 +2,10 @@ package com.example.planify;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a task in the Planify application.
+ * Each task is associated with a project.
+ */
 public class Task {
     private int id;
     private int projectId;
@@ -11,7 +15,7 @@ public class Task {
     private String createdBy;
     private LocalDate deadline;
 
-    // Конструктор
+    // Constructs a new Task
     public Task(int id, int projectId, String assignedTo, String title, String status, String createdBy, LocalDate deadline) {
         this.id = id;
         this.projectId = projectId;
@@ -22,7 +26,7 @@ public class Task {
         this.deadline = deadline;
     }
 
-    // Конструктор без id (для создания новых задач)
+    // Constructs a new Task without an id (for creating new tasks)
     public Task(int projectId, String assignedTo, String title, String status, String createdBy, LocalDate deadline) {
         this.projectId = projectId;
         this.assignedTo = assignedTo;
@@ -32,7 +36,7 @@ public class Task {
         this.deadline = deadline;
     }
 
-    // Геттеры и сеттеры
+    // Getters und Setters
     public int getId() {
         return id;
     }

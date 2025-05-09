@@ -254,6 +254,13 @@ public class TeamController {
                 dbHandler.addUserToTeam(team.getId(), user.getId(), user.getUserRole());
                 showSuccessAlert(user.getFirstName() + " added to team");
                 System.out.println("User added to team in the database.");
+
+                //отправка сообщения на почту, после добавления в команду
+                EmailSender emailSender = new EmailSender();
+                String emailAssignee = email.trim();
+                String firstName = user.getFirstName();
+                String nameOfTeam = teamIdResultat.getText();
+                emailSender.EmailSend(emailAssignee, firstName, "You have been added to a new team.\nTeam name: " + nameOfTeam + "\nCheck your app!");
             }
         });
     }
@@ -261,6 +268,9 @@ public class TeamController {
     @FXML
     private void handleRemoveUser() {
         User selectedUser = adminTableTeam.getSelectionModel().getSelectedItem();
+
+        //получаем почту, куда будет отправлено сообщение
+        String toEmail = selectedUser.getUserEmail();
         if (selectedUser == null) {
             System.out.println("No user selected.");
             new Shake(teamButtonRemoveUser).playAnim();
@@ -286,6 +296,12 @@ public class TeamController {
                 dbHandler.removeUserFromTeam(team.getId(), selectedUser.getId());
                 showSuccessAlert(selectedUser.getFirstName() + " removed from team");
                 System.out.println("User removed from team in the database.");
+
+                //отправляем сообщение на почту
+                EmailSender emailSender = new EmailSender();
+                String firstName = selectedUser.getFirstName();
+                String nameOfTeam = teamIdResultat.getText();
+                emailSender.EmailSend(toEmail, firstName, "You have been removed from team.\nTeam name: " + nameOfTeam + "\nCheck your app!");
             } else {
                 System.err.println("Ошибка: объект team не инициализирован");
             }
@@ -316,6 +332,12 @@ public class TeamController {
                 dbHandler.addUserToTeam(dbHandler.getTeamIdByName(teamName), currentUser.getId(), currentUser.getUserRole());
                 loadTeamForUser(currentUser); // Обновляем интерфейс после присоединения к команде
                 showSuccessAlert("You have successfully joined the team: " + teamName);
+
+                //отправляем сообщение на почту
+                EmailSender emailSender = new EmailSender();
+                String firstName = currentUser.getFirstName();
+                String toEmail = currentUser.getUserEmail();
+                emailSender.EmailSend(toEmail, firstName, "You joined a new team.\nTeam name: " + teamName + "\nLet's work together!");
             } else {
                 showAlertOneButton("Team with name \"" + teamName + "\" does not exist.");
             }
@@ -332,10 +354,17 @@ public class TeamController {
 
         if (showAlertTwoButton("Are you sure you want to leave the team?")) {
             User currentUser = Session.getInstance().getLoggedInUser();
+            String nameOfTeam = teamIdResultat.getText();
             DatabaseHandler dbHandler = new DatabaseHandler();
             dbHandler.removeUserFromTeam(team.getId(), currentUser.getId());
             loadTeamForUser(currentUser); // Обновляем интерфейс после удаления из команды
             showSuccessAlert("You have successfully left the team.");
+
+            //отправляем сообщение на почту
+            EmailSender emailSender = new EmailSender();
+            String firstName = currentUser.getFirstName();
+            String toEmail = currentUser.getUserEmail();
+            emailSender.EmailSend(toEmail, firstName, "You leaved your team.\nTeam name: " + nameOfTeam + "\nGood luck!");
         }
         System.out.println("User left the team.");
     }

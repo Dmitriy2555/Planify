@@ -1,5 +1,9 @@
 package com.example.planify;
 
+/**
+ * Represents a project in the Planify application.
+ * Each project is associated with a team and has a name and status.
+ */
 public class Project {
     private int id;
     private int team_id;

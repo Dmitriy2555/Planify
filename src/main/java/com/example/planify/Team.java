@@ -1,5 +1,9 @@
 package com.example.planify;
 
+/**
+ * Represents a team in the Planify application.
+ * Each team has a unique identifier, a name, and an administrator.
+ */
 public class Team {
     private int id;
     private String team_name;

@@ -157,17 +157,17 @@
             </VBox>
             <HBox prefHeight="66.0" prefWidth="662.0" spacing="50.0">
                <children>
-                  <Button fx:id="ButtonSave" alignment="CENTER" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="button-new" stylesheets="@style.css" text="Save changes" textFill="WHITE">
+                  <Button fx:id="ButtonSave" alignment="CENTER" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="neon-save-button" stylesheets="@style.css" text="Save changes" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="ButtonChangePass" alignment="CENTER" layoutX="60.0" layoutY="10.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="button-edit" stylesheets="@style.css" text="Change password" textFill="WHITE">
+                  <Button fx:id="ButtonChangePass" alignment="CENTER" layoutX="60.0" layoutY="10.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="neon-edit-button" stylesheets="@style.css" text="Change password" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="ButtonDeleteAccount" alignment="CENTER" layoutX="60.0" layoutY="10.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="button-delete" stylesheets="@style.css" text="Delete account" textFill="WHITE">
+                  <Button fx:id="ButtonDeleteAccount" alignment="CENTER" layoutX="60.0" layoutY="10.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="155.0" styleClass="neon-delete-button" stylesheets="@style.css" text="Delete account" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>

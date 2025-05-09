@@ -1,3 +1,40 @@
+/* Задний фон логина и регистрации */
+#loginBackground {
+    -fx-background-color: #3A2F5B; /* Серый цвет фона */
+}
+#registerBackground {
+    -fx-background-color: #3A2F5B; /* Серый цвет фона */
+}
+
+/* Кнопки логина и регистрации */
+.neon-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #7C3AED;
+    -fx-border-width: 2;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 10 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.3), 10, 0, 0, 0);
+    -fx-cursor: hand;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+}
+
+.neon-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.8), 20, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: #A855F7;
+}
+
+.neon-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
 /* Логин, Регистрация - задний фон форм */
 .anchor-pane {
     -fx-background-color: #5a4db3;
@@ -299,3 +336,155 @@
     -fx-text-fill: white;
 }
 
+/* Кнока сохранить в настройках */
+.neon-save-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #22C55E;
+    -fx-border-width: 2;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 10 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.3), 10, 0, 0, 0);
+    -fx-cursor: hand;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+}
+
+.neon-save-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.8), 20, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: #34D399;
+}
+
+.neon-save-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Кнока изменить в настройках */
+.neon-edit-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #FBBF24;
+    -fx-border-width: 2;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 10 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.3), 10, 0, 0, 0);
+    -fx-cursor: hand;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+}
+
+.neon-edit-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.8), 20, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: #F59E0B;
+}
+
+.neon-edit-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Кнока удалить в настройках */
+.neon-delete-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #EF4444;
+    -fx-border-width: 2;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 10 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.3), 10, 0, 0, 0);
+    -fx-cursor: hand;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+}
+
+.neon-delete-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.8), 20, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: #F87171;
+}
+
+.neon-delete-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Кнопка add Project, Проекты */
+.project-add-button
+{
+    -fx-background-color: transparent;
+    -fx-border-color: #22C55E;
+    -fx-text-fill: white; /* Белый текст */
+    -fx-font-size: 12px; /* Размер шрифта */
+    -fx-border-radius: 10px;
+}
+
+.project-add-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.8), 20, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: #34D399;
+}
+
+.project-add-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Кнопка edit Project, Проекты */
+.project-edit-button
+{
+    -fx-background-color: transparent;
+    -fx-border-color: #FBBF24;
+    -fx-text-fill: white; /* Белый текст */
+    -fx-font-size: 12px; /* Размер шрифта */
+    -fx-border-radius: 10px;
+}
+
+.project-edit-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.8), 20, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: #F59E0B;
+}
+
+.project-edit-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Кнопка delete Project, Проекты */
+.project-delete-button
+{
+    -fx-background-color: transparent;
+    -fx-border-color: #EF4444;
+    -fx-text-fill: white; /* Белый текст */
+    -fx-font-size: 12px; /* Размер шрифта */
+    -fx-border-radius: 10px;
+}
+
+.project-delete-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(124, 58, 237, 0.8), 20, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: #F87171;
+}
+
+.project-delete-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}

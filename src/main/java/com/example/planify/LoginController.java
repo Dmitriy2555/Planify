@@ -4,17 +4,18 @@ import Animations.Shake;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
+import javafx.util.Duration;
+
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 
 public class LoginController {
 
@@ -31,7 +32,7 @@ public class LoginController {
     private TextField loginField;
 
     @FXML
-    private Label loginLabel;
+    private Label loginLabel, labelPasswordForgot;
 
     @FXML
     private PasswordField passwordField;
@@ -43,6 +44,10 @@ public class LoginController {
     void initialize() {
         setupRegisterLabel(); // Настройка событий для надписи "Зарегистрироваться"
         setupLoginButton(); // Настройка кнопки "Войти"
+
+        labelPasswordForgot.setOnMouseEntered(event -> labelPasswordForgot.setUnderline(true));
+        labelPasswordForgot.setOnMouseExited(event -> labelPasswordForgot.setUnderline(false));
+        labelPasswordForgot.setOnMouseClicked(event -> handleForgotPassword());
     }
 
     // Настраиваем события для registerLabel (подчеркивание и переход на регистрацию)
@@ -58,10 +63,32 @@ public class LoginController {
             String loginText = loginField.getText().trim();
             String passwordText = passwordField.getText().trim();
 
-            if (validateInput(loginText, passwordText)) {
-                loginUser(loginText, passwordText); // Попытка входа
-            } else {
-                showEmptyFieldError(loginText, passwordText); // Ошибка пустых полей
+            loginField.setTooltip(null);
+            passwordField.setTooltip(null);
+
+            boolean hasError = false;
+
+            DatabaseHandler db = new DatabaseHandler();
+            if (loginText.isEmpty()) {
+                new Shake(loginField).playAnim();
+                showErrorTooltip("Login cannot be empty", loginField);
+                hasError = true;
+            }
+            else if (!db.isEmailExists(loginText))
+            {
+                new Shake(loginField).playAnim();
+                showErrorTooltip("Login does not exist", loginField);
+                hasError = true;
+            }
+
+            if (passwordText.isEmpty()) {
+                new Shake(passwordField).playAnim();
+                showErrorTooltip("Password cannot be empty", passwordField);
+                hasError = true;
+            }
+
+            if (!hasError) {
+                loginUser(loginText, passwordText);
             }
         });
     }
@@ -71,32 +98,40 @@ public class LoginController {
         return !loginText.isEmpty() && !passwordText.isEmpty();
     }
 
-    // Показываем ошибку, если поля пустые
-    private void showEmptyFieldError(String loginText, String passwordText) {
-        System.out.println("Login and Password cannot be empty");
-        if (loginText.isEmpty()) new Shake(loginField).playAnim();
-        if (passwordText.isEmpty()) new Shake(passwordField).playAnim();
-    }
+    /**
+     * Показывает сообщение об ошибке, если email уже используется.
+     */
+    private void showErrorTooltip(String warnung, TextField textField) {
+        Tooltip tooltip = new Tooltip(warnung);
+        tooltip.setShowDelay(Duration.ZERO);
+        tooltip.setStyle("-fx-background-color: #ffcccc; -fx-text-fill: red;");
 
-    // Показываем ошибку, если данные не найдены в базе
-    private void showLoginFailedError() {
-        System.out.println("Incorrect login or password");
-        new Shake(loginField).playAnim();
-        new Shake(passwordField).playAnim();
+        textField.setTooltip(tooltip);
     }
 
     // Логика входа в систему
     private void loginUser(String loginText, String passwordText) {
         DatabaseHandler dbHandler = new DatabaseHandler();
+
+        // 1. Проверяем, существует ли логин
+        if (!dbHandler.isEmailExists(loginText)) {
+            new Shake(loginField).playAnim();
+            showErrorTooltip("Login does not exist", loginField);
+            return;
+        }
+
+        // 2. Проверяем логин + пароль
         User user = new User(loginText, passwordText);
 
         try (ResultSet result = dbHandler.getUser(user)) {
             if (result.next()) {
-                User loggedInUser = createUserFromResult(result); // Создаем объект User
-                Session.getInstance().setLoggedInUser(loggedInUser); // Сохраняем пользователя в сессии
-                openNewWindow("dashboardWindow.fxml"); // Переход в личный кабинет
+                User loggedInUser = createUserFromResult(result);
+                Session.getInstance().setLoggedInUser(loggedInUser);
+                openNewWindow("dashboardWindow.fxml");
             } else {
-                showLoginFailedError(); // Ошибка неверного логина или пароля
+                // Логин существует, но пароль не совпал
+                new Shake(passwordField).playAnim();
+                showErrorTooltip("Incorrect password", passwordField);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -133,5 +168,88 @@ public class LoginController {
             e.printStackTrace();
             System.out.println("Error opening window!");
         }
+    }
+
+    @FXML
+    private void handleForgotPassword() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Forgot Password");
+        dialog.setHeaderText("Enter your email to receive your password:");
+        dialog.setGraphic(null);
+        dialog.getEditor().setPromptText("Email");
+
+        // Изменяем текст на кнопках
+        ButtonType addButtonType = new ButtonType("Send", ButtonType.OK.getButtonData());
+        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonType.CANCEL.getButtonData());
+        dialog.getDialogPane().getButtonTypes().setAll(addButtonType, cancelButtonType);
+
+        //Устанавливаем иконку окна сброса пароля
+        // Устанавливаем иконку для окна диалога
+        Image icon = new Image(getClass().getResourceAsStream("/com/example/planify/images/iconChangePass.png"));
+        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(icon);
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(email -> {
+            if (email.trim().isEmpty()) {
+                showAlertOneButton("Email cannot be empty.");
+                return;
+            }
+
+            DatabaseHandler dbHandler = new DatabaseHandler();
+            String password = dbHandler.getPasswordByEmail(email.trim());
+
+            if (password == null) {
+                showAlertOneButton("Email does not exist.");
+            } else {
+                //Отправка сообщения пользователю на почту
+                EmailSender emailSender = new EmailSender();
+                User user = dbHandler.getUserByEmail(email.trim());
+                emailSender.EmailSend(email, user.getFirstName(), "Your password is: " + password + "\nDon't forget your password!");
+
+                showSuccessAlert("Password has been sent to your email.");
+            }
+        });
+    }
+
+    private Alert createAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        alert.getDialogPane().setGraphic(null);
+
+        return alert;
+    }
+
+    private void showSuccessAlert(String message) {
+        Alert alert = createAlert(Alert.AlertType.INFORMATION, "Success", null, message);
+
+        // Устанавливаем иконку для окна диалога (галочка)
+        Image icon = new Image(getClass().getResourceAsStream("/com/example/planify/images/iconSuccess.png"));
+        Stage dialogStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(icon);
+
+        // Изменяем текст на кнопках
+        ButtonType okButtonType = new ButtonType("Close", ButtonType.OK.getButtonData());
+        alert.getDialogPane().getButtonTypes().setAll(okButtonType);
+
+        alert.showAndWait();
+    }
+
+    private void showAlertOneButton(String message) {
+        Alert alert = createAlert(Alert.AlertType.WARNING, "Error", null, message);
+
+        // Устанавливаем иконку для окна диалога
+        Image icon = new Image(getClass().getResourceAsStream("/com/example/planify/images/iconWarning.png"));
+        Stage dialogStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(icon);
+
+        // Изменяем текст на кнопках
+        ButtonType cancelButtonType = new ButtonType("Close", ButtonType.CANCEL.getButtonData());
+        alert.getDialogPane().getButtonTypes().setAll(cancelButtonType);
+
+        alert.showAndWait();
     }
 }

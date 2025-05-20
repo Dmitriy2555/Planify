@@ -1,16 +1,16 @@
 /* Задний фон логина и регистрации */
 #loginBackground {
-    -fx-background-color: #3A2F5B; /* Серый цвет фона */
+    -fx-background-color: #333333; /* Серый цвет фона */
 }
 #registerBackground {
-    -fx-background-color: #3A2F5B; /* Серый цвет фона */
+    -fx-background-color: #333333; /* Серый цвет фона */
 }
 
 /* Кнопки логина и регистрации */
 .neon-button {
     -fx-background-color: transparent;
-    -fx-border-color: #7C3AED;
-    -fx-border-width: 2;
+    -fx-border-color: white;
+    -fx-border-width: 1;
     -fx-text-fill: white;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -39,6 +39,8 @@
 .anchor-pane {
     -fx-background-color: #5a4db3;
     -fx-background-radius: 20;
+
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.3), 20, 0.5, 0, 0);
 }
 
 /* Главная - задний фон*/
@@ -158,7 +160,16 @@
 
 /* Dashboard - выделенная ячейка списки заданий*/
 .dashboard-tasks-list .list-cell:filled:selected {
-    -fx-background-color: #333333; /* Темно-серый фон */
+    -fx-background-color: #e0e0e0;; /* Темно-серый фон */
+    -fx-text-fill: black; /* Читаемый текст */
+    -fx-border-color: transparent;     /* Убираем возможные границы */
+    -fx-background-radius: 15;    /* Скругленные углы */
+}
+
+/* Dashboard - выделенная ячейка списки заданий*/
+.dashboard-tasks-list .list-cell:filled:hover {
+    -fx-background-color: #e0e0e0;; /* Темно-серый фон */
+    -fx-text-fill: black; /* Читаемый текст */
     -fx-border-color: transparent;     /* Убираем возможные границы */
     -fx-background-radius: 15;    /* Скругленные углы */
 }
@@ -323,17 +334,54 @@
     -fx-text-fill: white;
 }
 
-/* Стиль выбора роли, Profile Settings */
+/* Стиль выбора роли, проекта */
 .choice-box-profile {
-    -fx-background-color: rgba(0,0,0,0);
+    -fx-background-color: transparent;
     -fx-border-width: 0 0 1 0;
     -fx-border-color: gray;
-    -fx-text-fill: white;
     -fx-font-size: 15px;
 }
 
+.choice-box-profile:hover {
+    -fx-border-color: #9f9fff;
+    -fx-border-width: 0 0 1.5 0; /* чуть толще снизу */
+    -fx-cursor: hand;
+}
+
+.choice-box-profile:hover .arrow {
+    -fx-background-color: #9f9fff;
+}
+
+/* Цвет основного текста */
 .choice-box-profile .label {
     -fx-text-fill: white;
+}
+
+.choice-box-profile .arrow {
+    -fx-background-color: white;
+}
+
+/* Всплывающее меню (выпадающий список) */
+.choice-box-profile .context-menu {
+    -fx-background-color: #2f2a4a;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 6, 0, 0, 2);
+}
+
+/* Стиль пунктов в списке */
+.choice-box-profile .menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 6 12;
+    -fx-background-radius: 6px;
+}
+
+/* Наведение на элемент */
+.choice-box-profile .menu-item:focused {
+    -fx-background-color: #4a3e70;
 }
 
 /* Кнока сохранить в настройках */

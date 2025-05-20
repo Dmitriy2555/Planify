@@ -44,4 +44,9 @@ public class Constant {
     public static final String TASK_STATUS = "status";
     public static final String TASK_CREATED_BY = "created_by";
     public static final String TASK_DEADLINE = "deadline";
+
+    // Avatar
+    public static final String USER_AVATAR_PATH = "avatar_path";
+    public static final String USER_CONTACTS_TABLE = "user_contacts";
+    public static final String USER_CONTACTS_USER_ID = "user_id";
 }

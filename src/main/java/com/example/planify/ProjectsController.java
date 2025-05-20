@@ -53,18 +53,20 @@ public class ProjectsController {
     @FXML
     private ResourceBundle resources;
 
+    private AvatarHandler avatarHandler;
+
     @FXML
     void initialize() {
         User currentUser = Session.getInstance().getLoggedInUser();
         if (currentUser != null) {
             initializeUserData(currentUser);
             configureInterface(currentUser);
+            avatarHandler = new AvatarHandler(circleBackAvatar, currentUser, false);
         }
 
         setupUIElements();
         setupEventListeners();
         populateProjectsList(currentUser);
-        setupUserAvatar();
         setupSelectionHandlers();
 
         // Обработчик выбора элемента в ListView
@@ -131,15 +133,6 @@ public class ProjectsController {
         } else {
             System.out.println("No user is currently logged in.");
         }
-    }
-
-    // Устанавливаем аватар пользователя
-    private void setupUserAvatar() {
-        Image image = new Image(getClass().getResourceAsStream("/com/example/planify/images/user.png"));
-        circleBackAvatar.setRadius(50);
-        circleBackAvatar.setFill(new ImagePattern(image));
-        circleBackAvatar.setStroke(javafx.scene.paint.Color.LIGHTGRAY);
-        circleBackAvatar.setStrokeWidth(1);
     }
 
     // Обработчик смены активного меню
@@ -397,14 +390,33 @@ public class ProjectsController {
     }
 
     private void updateDetails(User currentUser, String projectName) {
-        if ("Admin".equalsIgnoreCase(currentUser.getUserRole())) {
+        // Получаем выбранный проект напрямую из ListView
+        String selectedProject = projectsProjectsList.getSelectionModel().getSelectedItem();
+
+        // Проверяем, выбран ли проект
+        boolean isProjectSelected = selectedProject != null;
+
+        if ("Admin".equalsIgnoreCase(currentUser.getUserRole()) && isProjectSelected) {
             editProjectButton.setVisible(true);
             deleteProjectButton.setVisible(true);
         }
-        detailsNameOfProjectResultat.setText(projectName);
-        DatabaseHandler dbHandler = new DatabaseHandler();
-        detailsStatusResultat.setText(dbHandler.getProjectStatus(projectName));
-        detailsDeadlineResultat.setText(String.valueOf(getCreatedTaskFromProject()));
+        else
+        {
+            editProjectButton.setVisible(false);
+            deleteProjectButton.setVisible(false);
+        }
+        // Обновляем детали проекта только если проект выбран
+        if (isProjectSelected) {
+            detailsNameOfProjectResultat.setText(selectedProject);
+            DatabaseHandler dbHandler = new DatabaseHandler();
+            detailsStatusResultat.setText(dbHandler.getProjectStatus(selectedProject));
+            detailsDeadlineResultat.setText(String.valueOf(getCreatedTaskFromProject()));
+        } else {
+            // Очищаем поля, если проект не выбран
+            detailsNameOfProjectResultat.setText("");
+            detailsStatusResultat.setText("");
+            detailsDeadlineResultat.setText("");
+        }
     }
 
     private void resetDetails() {
@@ -462,12 +474,18 @@ public class ProjectsController {
             if (newSelection != null) {
                 urgentTasksList.getSelectionModel().clearSelection();
             }
+
+            editProjectButton.setVisible(true);
+            deleteProjectButton.setVisible(true);
         });
 
         urgentTasksList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 projectsProjectsList.getSelectionModel().clearSelection();
             }
+
+            editProjectButton.setVisible(false);
+            deleteProjectButton.setVisible(false);
         });
     }
 }

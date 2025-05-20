@@ -57,17 +57,19 @@ public class DashboardController {
     @FXML
     private ResourceBundle resources;
 
+    private AvatarHandler avatarHandler;
+
     @FXML
     void initialize() {
         User currentUser = Session.getInstance().getLoggedInUser();
         if (currentUser != null) {
             initializeUserData(currentUser);
+            avatarHandler = new AvatarHandler(circleBackAvatar, currentUser, false);
         }
 
         setupUIElements();
         setupEventListeners();
         populateProjectLists(currentUser);
-        setupUserAvatar();
         setupSelectionHandlers();
 
         // Добавляем обработчик событий для выбора проекта
@@ -131,15 +133,6 @@ public class DashboardController {
         } else {
             System.out.println("No user is currently logged in.");
         }
-    }
-
-    // Устанавливаем аватар пользователя
-    private void setupUserAvatar() {
-        Image image = new Image(getClass().getResourceAsStream("/com/example/planify/images/user.png"));
-        circleBackAvatar.setRadius(50);
-        circleBackAvatar.setFill(new ImagePattern(image));
-        circleBackAvatar.setStroke(javafx.scene.paint.Color.LIGHTGRAY);
-        circleBackAvatar.setStrokeWidth(1);
     }
 
     // Обработчик смены активного меню

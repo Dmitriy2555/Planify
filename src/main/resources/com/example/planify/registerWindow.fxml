@@ -6,8 +6,6 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -28,28 +26,13 @@
                 <TextField fx:id="registerFirstNameField" layoutX="43.0" layoutY="177.0" prefHeight="26.0" prefWidth="278.0" promptText="FirstName" styleClass="text-field" />
                 <PasswordField fx:id="registerPasswordField" layoutX="470.0" layoutY="235.0" prefHeight="26.0" prefWidth="278.0" promptText="Password" styleClass="text-field" />
                 <TextField fx:id="registerEmailField" layoutX="43.0" layoutY="235.0" prefHeight="26.0" prefWidth="278.0" promptText="Email" styleClass="text-field" />
-                <ImageView fx:id="registerIconUserFirstname" fitHeight="26.0" fitWidth="25.0" layoutX="14.0" layoutY="177.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@images/iconUser.png" />
-                    </image>
-                </ImageView>
-                <ImageView fx:id="registerIconPassword" fitHeight="34.0" fitWidth="31.0" layoutX="749.0" layoutY="232.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@images/iconPassword.png" />
-                    </image>
-                </ImageView>
-                <ImageView fx:id="registerIconEmail" fitHeight="33.0" fitWidth="25.0" layoutX="14.0" layoutY="236.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@images/iconEmail.png" />
-                    </image>
-                </ImageView>
                 <Button fx:id="registerContinueButton" layoutX="320.0" layoutY="357.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="122.0" styleClass="neon-button" stylesheets="@style.css" text="Sign Up">
                     <font>
                         <Font name="System Bold" size="16.0" />
                     </font>
                 </Button>
                 <TextField fx:id="registerLastNameField" layoutX="470.0" layoutY="175.0" prefHeight="26.0" prefWidth="278.0" promptText="LastName" styleClass="text-field" />
-                <ChoiceBox fx:id="registerChoiceBoxRole" layoutX="597.0" layoutY="285.0" prefWidth="150.0" styleClass="choice-box" stylesheets="@style.css" />
+                <ChoiceBox fx:id="registerChoiceBoxRole" layoutX="597.0" layoutY="285.0" prefWidth="150.0" styleClass="choice-box-profile" stylesheets="@style.css" />
                 <Label fx:id="registerRoleLabel" layoutX="470.0" layoutY="289.0" styleClass="label" text="Choose your role:">
                     <font>
                         <Font name="System Bold" size="14.0" />
@@ -57,11 +40,6 @@
                 </Label>
                 <RadioButton fx:id="registerRadioButtonMale" layoutX="43.0" layoutY="284.0" mnemonicParsing="false" styleClass="radio-button" text="Male" textFill="WHITE" />
                 <RadioButton fx:id="registerRadioButtonFemale" layoutX="241.0" layoutY="284.0" mnemonicParsing="false" styleClass="radio-button" text="Female" textFill="WHITE" />
-            <ImageView fx:id="registerIconUserLastname" fitHeight="26.0" fitWidth="25.0" layoutX="752.0" layoutY="176.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@images/iconUser.png" />
-               </image>
-            </ImageView>
             </children>
         </AnchorPane>
     </children>

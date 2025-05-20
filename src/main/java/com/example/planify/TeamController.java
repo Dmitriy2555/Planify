@@ -47,17 +47,19 @@ public class TeamController {
 
     private Team team; // Переменная для хранения команды
 
+    private AvatarHandler avatarHandler;
+
     @FXML
     void initialize() {
         User currentUser = Session.getInstance().getLoggedInUser();
         if (currentUser != null) {
             initializeUserData(currentUser);
             configureInterface(currentUser);
+            avatarHandler = new AvatarHandler(circleBackAvatar, currentUser, false);
         }
 
         setupUIElements();
         setupEventListeners();
-        setupUserAvatar();
 
         // Убедись, что команда загружается
         if ("Admin".equalsIgnoreCase(currentUser.getUserRole())) {
@@ -165,14 +167,6 @@ public class TeamController {
         menuDashboard.setOnMouseClicked(event -> openNewWindow("dashboardWindow.fxml"));
         menuTasks.setOnMouseClicked(event -> openNewWindow("tasksWindow.fxml"));
         menuSettings.setOnMouseClicked(event -> openNewWindow("settingsWindow.fxml"));
-    }
-
-    private void setupUserAvatar() {
-        Image image = new Image(getClass().getResourceAsStream("/com/example/planify/images/user.png"));
-        circleBackAvatar.setRadius(50);
-        circleBackAvatar.setFill(new ImagePattern(image));
-        circleBackAvatar.setStroke(javafx.scene.paint.Color.LIGHTGRAY);
-        circleBackAvatar.setStrokeWidth(1);
     }
 
     @FXML
@@ -483,7 +477,7 @@ public class TeamController {
                 setupTeamTable(currentUser);
             } else {
                 System.out.println("No team found for the current user.");
-                teamIdResultat.setText("Выберите имя");
+                teamIdResultat.setText("Enter id");
                 teamIdResultat.setOnMouseClicked(event -> createNewTeam(currentUser));
             }
         } catch (SQLException | ClassNotFoundException e) {
@@ -574,6 +568,9 @@ public class TeamController {
                 // Добавляем админа в команду
                 if (team != null) {
                     dbHandler.addUserToTeam(team.getId(), adminId, currentUser.getUserRole());
+                    setupTeamTable(currentUser);
+                    adminTableTeam.refresh();
+                    showSuccessAlert("Team successfully created");
                     System.out.println("Admin added to the team.");
                 } else {
                     System.err.println("Ошибка: объект team не инициализирован");

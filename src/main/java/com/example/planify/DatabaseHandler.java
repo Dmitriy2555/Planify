@@ -83,6 +83,82 @@ public class DatabaseHandler extends Configuration {
         return resSet;
     }
 
+    // Обновляем фото профиля
+    public boolean updateUserAvatar(int userId, String avatarPath) {
+        String updateQuery = "UPDATE " + Constant.USER_CONTACTS_TABLE +
+                " SET " + Constant.USER_AVATAR_PATH + "=? " +
+                " WHERE " + Constant.USER_CONTACTS_USER_ID + "=?";
+
+        try (Connection connection = getDbConnection();
+             PreparedStatement prSt = connection.prepareStatement(updateQuery)) {
+
+            prSt.setString(1, avatarPath);
+            prSt.setInt(2, userId);
+
+            int affectedRows = prSt.executeUpdate();
+
+            // Если пользователь не найден в таблице user_contacts, создаем новую запись
+            if (affectedRows == 0) {
+                String insertQuery = "INSERT INTO " + Constant.USER_CONTACTS_TABLE +
+                        "(" + Constant.USER_CONTACTS_USER_ID + ", " + Constant.USER_AVATAR_PATH + ")" +
+                        " VALUES(?, ?)";
+
+                try (PreparedStatement insertSt = connection.prepareStatement(insertQuery)) {
+                    insertSt.setInt(1, userId);
+                    insertSt.setString(2, avatarPath);
+
+                    return insertSt.executeUpdate() > 0;
+                }
+            }
+
+            return affectedRows > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // получаем фото профиля
+    public String getUserAvatar(int userId) {
+        String selectQuery = "SELECT " + Constant.USER_AVATAR_PATH +
+                " FROM " + Constant.USER_CONTACTS_TABLE +
+                " WHERE " + Constant.USER_CONTACTS_USER_ID + "=?";
+
+        try (Connection connection = getDbConnection();
+             PreparedStatement prSt = connection.prepareStatement(selectQuery)) {
+
+            prSt.setInt(1, userId);
+            ResultSet resultSet = prSt.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString(Constant.USER_AVATAR_PATH);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // Retrieves a password from the database by their email.
+    public String getPasswordByEmail(String email) {
+        String query = "SELECT password FROM users WHERE email = ?";
+        try (Connection conn = getDbConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("password");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
     // Retrieves a user from the database by their first and last name.
     public User getUserByFullName(String firstName, String lastName) {
         String selectQuery = "SELECT * FROM users WHERE firstname = ? AND lastname = ?";
@@ -373,6 +449,21 @@ public class DatabaseHandler extends Configuration {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // Удаляет все записи из таблицы user_contacts для указанного user_id
+    public void deleteUserContactsByUserId(int userId) {
+        String delete = "DELETE FROM user_contacts WHERE user_id = ?";
+
+        try (Connection connection = getDbConnection();
+             PreparedStatement prSt = connection.prepareStatement(delete)) {
+            prSt.setInt(1, userId);
+            int rowsAffected = prSt.executeUpdate();
+            System.out.println("Удалено " + rowsAffected + " контактов для пользователя с ID " + userId);
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Не удалось удалить контакты пользователя: " + e.getMessage());
+        }
     }
 
     // Checks if an email already exists in the database.

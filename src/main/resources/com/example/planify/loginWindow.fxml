@@ -40,6 +40,11 @@
                   <Image url="@images/iconUser.png" />
                </image>
             </ImageView>
+            <Label fx:id="labelPasswordForgot" layoutX="437.0" layoutY="285.0" text="Forgot password?">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

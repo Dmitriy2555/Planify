@@ -8,6 +8,7 @@ module com.example.planify {
     requires javafx.fxml;
     requires javafx.controls;
     requires jakarta.mail;
+    requires java.desktop;
 
     opens com.example.planify to javafx.fxml; // Добавьте эту строку
     exports com.example.planify;

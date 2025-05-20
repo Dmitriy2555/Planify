@@ -93,12 +93,15 @@ public class TasksController {
     @FXML
     private ListView tasksToDoListViewBack, tasksInProgressListViewBack, tasksCompletedListViewBack;
 
+    private AvatarHandler avatarHandler;
+
     @FXML
     void initialize() {
         User currentUser = Session.getInstance().getLoggedInUser();
         if (currentUser != null) {
             initializeUserData(currentUser);
             configureInterface(currentUser);
+            avatarHandler = new AvatarHandler(circleBackAvatar, currentUser, false);
         }
         setupUIElements();
         setupEventListeners();
@@ -113,7 +116,6 @@ public class TasksController {
         }
 
         handleProjectSelection();
-        setupUserAvatar();
     }
 
     // Устанавливаем данные текущего пользователя
@@ -151,15 +153,6 @@ public class TasksController {
         ButtonCreateTask.setOnMouseClicked(event -> handleCreateTask());
         ButtonDeleteTask.setOnMouseClicked(event -> handleRemoveTask());
         ButtonEditTask.setOnMouseClicked(event -> handleEditTask());
-    }
-
-    // Устанавливаем аватар пользователя
-    private void setupUserAvatar() {
-        Image image = new Image(getClass().getResourceAsStream("/com/example/planify/images/user.png"));
-        circleBackAvatar.setRadius(50);
-        circleBackAvatar.setFill(new ImagePattern(image));
-        circleBackAvatar.setStroke(javafx.scene.paint.Color.LIGHTGRAY);
-        circleBackAvatar.setStrokeWidth(1);
     }
 
     // Обработчик смены активного меню
@@ -293,7 +286,7 @@ public class TasksController {
                     //Отправка сообщения пользователю на почту
                     EmailSender emailSender = new EmailSender();
                     String emailAssignee = new DatabaseHandler().getUserEmailById(assigneeId);
-                    emailSender.EmailSend(emailAssignee, assigneeFirstName, "You have a new task!\nTo do: " + taskName + "\nDeadline: " + deadline);
+                    emailSender.EmailSend(emailAssignee, assigneeName, "You have a new task!\nTo do: " + taskName + "\nDeadline: " + deadline);
                 } else {
                     showAlertOneButton("Failed to create task.");
                 }

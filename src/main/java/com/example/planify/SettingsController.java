@@ -154,16 +154,73 @@ public class SettingsController {
         activeButton = menuSettings;
     }
 
-    // Добавляем обработчики событий
     private void setupEventListeners(User user) {
         dashboardLabenSignOut.setOnMouseClicked(event -> handleSignOut());
         dashboardLabenSignOut.setOnMouseEntered(event -> dashboardLabenSignOut.setUnderline(true));
         dashboardLabenSignOut.setOnMouseExited(event -> dashboardLabenSignOut.setUnderline(false));
 
-        menuProjects.setOnMouseClicked(event -> openNewWindow("projectsWindow.fxml"));
-        menuTeam.setOnMouseClicked(event -> openNewWindow("teamWindow.fxml"));
-        menuTasks.setOnMouseClicked(event -> openNewWindow("tasksWindow.fxml"));
-        menuDashboard.setOnMouseClicked(event -> openNewWindow("dashboardWindow.fxml"));
+        User currentUser = Session.getInstance().getLoggedInUser();
+        DatabaseHandler dbHandler = new DatabaseHandler(); // Создаем один экземпляр для оптимизации
+        menuDashboard.setOnMouseClicked(event -> {
+            int teamId = dbHandler.getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                openNewWindow("dashboardWindow.fxml");
+                handleMenuClick(new ActionEvent(menuDashboard, null)); // Активируем кнопку только при доступе
+            } else {
+                String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                        "Please create a team first to open a dashboard." :
+                        "Please join the team first to open on dashboard.";
+                showAlertOneButton(message);
+            }
+        });
+
+        menuProjects.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                ObservableList<String> projects = dbHandler.loadProjectsByTeamId(teamId);
+                // Если пользователь — админ, он может открыть страницу даже без проектов
+                if ("Admin".equalsIgnoreCase(currentUser.getUserRole()) || !projects.isEmpty()) {
+                    openNewWindow("projectsWindow.fxml");
+                    handleMenuClick(new ActionEvent(menuProjects, null)); // Активируем кнопку только при доступе
+                } else {
+                    // Для не-админов: если проектов нет, показываем алерт
+                    showAlertOneButton("No projects available. Please ask your admin to create a project.");
+                }
+            } else {
+                showAlertOneButton("You are not a member of any team. Join a team to work on projects.");
+            }
+        });
+
+        menuTasks.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                ObservableList<String> projects = dbHandler.loadProjectsByTeamId(teamId);
+                if (!projects.isEmpty()) {
+                    openNewWindow("tasksWindow.fxml");
+                    handleMenuClick(new ActionEvent(menuTasks, null)); // Активируем кнопку только при доступе
+                } else {
+                    String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                            "Please create a project first to work on tasks." :
+                            "No tasks available. Please ask your admin to create a project.";
+                    showAlertOneButton(message);
+                }
+            } else {
+                String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                        "Please create a team first to work on tasks." :
+                        "Please join the team first to work on tasks.";
+                showAlertOneButton(message);
+            }
+        });
+
+        menuTeam.setOnMouseClicked(event -> {
+            openNewWindow("teamWindow.fxml");
+            handleMenuClick(new ActionEvent(menuTeam, null)); // Без ограничений
+        });
+
+        menuSettings.setOnMouseClicked(event -> {
+            openNewWindow("settingsWindow.fxml");
+            handleMenuClick(new ActionEvent(menuSettings, null)); // Без ограничений
+        });
 
         ButtonSave.setOnMouseClicked(event -> handleSaveChanges());
         ButtonChangePass.setOnMouseClicked(event -> handleChangePassword());
@@ -173,12 +230,37 @@ public class SettingsController {
     // Обработчик смены активного меню
     @FXML
     private void handleMenuClick(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+        User currentUser = Session.getInstance().getLoggedInUser();
+        int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+
+        // Проверяем, является ли кнопка одной из ограниченных и есть ли доступ
+        if ((clickedButton == menuDashboard || clickedButton == menuProjects || clickedButton == menuTasks) && teamId == -1) {
+            // Не меняем стиль, так как доступа нет
+            return;
+        }
+
+        // Дополнительная проверка для Tasks: нужны проекты
+        if (clickedButton == menuTasks) {
+            ObservableList<String> projects = new DatabaseHandler().loadProjectsByTeamId(teamId);
+            if (projects.isEmpty()) {
+                return; // Не меняем стиль, если нет проектов
+            }
+        }
+
+        // Дополнительная проверка для Projects: нужны проекты для не-админов
+        if (clickedButton == menuProjects && !"Admin".equalsIgnoreCase(currentUser.getUserRole())) {
+            ObservableList<String> projects = new DatabaseHandler().loadProjectsByTeamId(teamId);
+            if (projects.isEmpty()) {
+                return; // Не меняем стиль для не-админов, если нет проектов
+            }
+        }
+
         if (activeButton != null) {
             activeButton.getStyleClass().remove("button-menu-active");
             activeButton.getStyleClass().add("button-menu");
         }
 
-        Button clickedButton = (Button) event.getSource();
         clickedButton.getStyleClass().remove("button-menu");
         clickedButton.getStyleClass().add("button-menu-active");
 
@@ -215,21 +297,47 @@ public class SettingsController {
         User currentUser = Session.getInstance().getLoggedInUser();
         DatabaseHandler dbHandler = new DatabaseHandler();
 
+        // Сбрасываем стили перед проверкой
+        resetFieldStyles();
+
         // Проверяем, что все поля заполнены
-        if (FirstNameInput.getText().isEmpty() ||
-                LastNameInput.getText().isEmpty() ||
-                ChoiceBoxRole.getValue() == null ||
-                PhoneInput.getText().isEmpty() ||
-                AddressInput.getText().isEmpty() ||
-                EmailInput.getText().isEmpty() || // Добавляем проверку для EmailInput
-                PhoneInput.getText().equals("Not specified") ||
-                AddressInput.getText().equals("Not specified")) {
+        boolean hasEmptyFields = false;
+        if (FirstNameInput.getText().trim().isEmpty()) {
+            FirstNameInput.setStyle("-fx-border-color: red; -fx-border-width: 0 0 1 0;");
+            hasEmptyFields = true;
+        }
+        if (LastNameInput.getText().trim().isEmpty()) {
+            LastNameInput.setStyle("-fx-border-color: red; -fx-border-width: 0 0 1 0;");
+            hasEmptyFields = true;
+        }
+        if (PhoneInput.getText().trim().isEmpty() || PhoneInput.getText().equals("Not specified")) {
+            PhoneInput.setStyle("-fx-border-color: red; -fx-border-width: 0 0 1 0;");
+            hasEmptyFields = true;
+        }
+        if (AddressInput.getText().trim().isEmpty() || AddressInput.getText().equals("Not specified")) {
+            AddressInput.setStyle("-fx-border-color: red; -fx-border-width: 0 0 1 0;");
+            hasEmptyFields = true;
+        }
+        if (EmailInput.getText().trim().isEmpty()) {
+            EmailInput.setStyle("-fx-border-color: red; -fx-border-width: 0 0 1 0;");
+            hasEmptyFields = true;
+        }
+
+        if (hasEmptyFields) {
             // Если хотя бы одно поле пустое, показываем алерт
             showAlertOneButton("All fields must be filled out.");
             return;
         }
 
-        if (!EmailInput.getText().equals(currentUser.getUserEmail()) && dbHandler.isEmailExists(EmailInput.getText())) {
+        // Проверяем корректность формата email
+        String email = EmailInput.getText().trim();
+        if (!email.contains("@") || !email.contains(".")) {
+            EmailInput.setStyle("-fx-border-color: red; -fx-border-width: 0 0 1 0;");
+            showAlertOneButton("Incorrect email format.");
+            return;
+        }
+
+        if (!EmailInput.getText().trim().equals(currentUser.getUserEmail()) && dbHandler.isEmailExists(EmailInput.getText().trim())) {
             showAlertOneButton("This email is already in use.");
             return;
         }
@@ -260,6 +368,15 @@ public class SettingsController {
         // Обновляем данные в интерфейсе
         initializeUserData(currentUser);
         showSuccessAlert("User data updated successfully");
+    }
+
+    // Метод для сброса стилей полей
+    private void resetFieldStyles() {
+        FirstNameInput.setStyle("");
+        LastNameInput.setStyle("");
+        PhoneInput.setStyle("");
+        AddressInput.setStyle("");
+        EmailInput.setStyle("");
     }
 
     @FXML
@@ -313,18 +430,28 @@ public class SettingsController {
         }
     }
 
-    @FXML
     private void handleRemoveUser() {
         User currentUser = Session.getInstance().getLoggedInUser();
         DatabaseHandler dbHandler = new DatabaseHandler();
 
-        if (showAlertTwoButton("Are you sure you want to delete your profile?")) {
-            try {
-                if (currentUser.getUserRole().equalsIgnoreCase("Admin")) {
-                    // Получаем список участников команды
-                    ObservableList<User> teamMembers = dbHandler.loadTeamMembersByTeamId(dbHandler.getTeamIdByUserId(currentUser.getId()));
+        // Show confirmation dialog for deletion
+        if (!showAlertTwoButton("Are you sure you want to delete your profile?")) {
+            System.out.println("Deletion canceled.");
+            return;
+        }
+
+        try {
+            // Get the team ID of the current user
+            int teamId = dbHandler.getTeamIdByUserId(currentUser.getId());
+
+            // Check if the user is an admin
+            if (currentUser.getUserRole().equalsIgnoreCase("Admin")) {
+                if (teamId != -1) {
+                    // Get the list of team members
+                    ObservableList<User> teamMembers = dbHandler.loadTeamMembersByTeamId(teamId);
+                    // Check if there are other members besides the current user
                     if (!teamMembers.isEmpty() && !(teamMembers.size() == 1 && teamMembers.get(0).getId() == currentUser.getId())) {
-                        // Создаем список с именами и фамилиями участников, исключая текущего пользователя
+                        // Create a list of member names, excluding the current user
                         ObservableList<String> teamMembersNames = FXCollections.observableArrayList();
                         for (User member : teamMembers) {
                             if (member.getId() != currentUser.getId()) {
@@ -332,84 +459,101 @@ public class SettingsController {
                             }
                         }
 
-                        // Показываем диалоговое окно с выбором нового администратора, только если есть другие участники
+                        // If there are other members, show dialog to select a new admin
                         if (!teamMembersNames.isEmpty()) {
                             String newAdminName = showAdminSelectionDialog(teamMembersNames);
-                            if (newAdminName != null) {
-                                // Разделяем имя и фамилию
-                                String[] nameParts = newAdminName.split(" ");
-                                if (nameParts.length == 2) {
-                                    String firstName = nameParts[0];
-                                    String lastName = nameParts[1];
-
-                                    // Находим соответствующий объект User в базе данных
-                                    User newAdmin = dbHandler.getUserByFullName(firstName, lastName);
-
-                                    if (newAdmin != null) {
-                                        // Переназначаем статус администратора
-                                        dbHandler.updateAdminRole(newAdmin.getId());
-
-                                        // Обновляем запись в таблице teams
-                                        int teamId = dbHandler.getTeamIdByUserId(currentUser.getId());
-                                        dbHandler.updateTeamAdmin(teamId, newAdmin.getId());
-
-                                        // Переназначаем задачи новому администратору
-                                        List<Task> userTasks = dbHandler.getTasksByUserId(currentUser.getId());
-                                        for (Task task : userTasks) {
-                                            dbHandler.reassignTask(task.getId(), newAdmin.getId(), currentUser.getId());
-                                        }
-                                    } else {
-                                        // Если новый администратор не найден, отменяем удаление
-                                        System.out.println("Deletion canceled: new administrator not selected.");
-                                        showAlertOneButton("Failed to select a new administrator. Deletion canceled.");
-                                        return;
-                                    }
-                                } else {
-                                    // Если имя и фамилия не разделены корректно, отменяем удаление
-                                    System.out.println("Deletion canceled: incorrect name format.");
-                                    showAlertOneButton("Incorrect name format. Deletion canceled.");
-                                    return;
-                                }
-                            } else {
-                                // Если новый администратор не выбран, отменяем удаление
+                            if (newAdminName == null) {
                                 System.out.println("Deletion canceled: new administrator not selected.");
                                 showAlertOneButton("New administrator not selected. Deletion canceled.");
                                 return;
                             }
+
+                            // Split name and surname
+                            String[] nameParts = newAdminName.split(" ");
+                            if (nameParts.length != 2) {
+                                System.out.println("Deletion canceled: incorrect name format.");
+                                showAlertOneButton("Incorrect name format. Deletion canceled.");
+                                return;
+                            }
+
+                            String firstName = nameParts[0];
+                            String lastName = nameParts[1];
+
+                            // Find the new admin in the database
+                            User newAdmin = dbHandler.getUserByFullName(firstName, lastName);
+                            if (newAdmin == null) {
+                                System.out.println("Deletion canceled: new administrator not found.");
+                                showAlertOneButton("Failed to select a new administrator. Deletion canceled.");
+                                return;
+                            }
+
+                            // Reassign admin status
+                            dbHandler.updateAdminRole(newAdmin.getId());
+
+                            // Update the team admin record
+                            dbHandler.updateTeamAdmin(teamId, newAdmin.getId());
+
+                            // Reassign tasks to the new administrator
+                            List<Task> userTasks = dbHandler.getTasksByUserId(currentUser.getId());
+                            for (Task task : userTasks) {
+                                dbHandler.reassignTask(task.getId(), newAdmin.getId(), currentUser.getId());
+                            }
+                        } else {
+                            // If the admin is the last member, delete all tasks and projects associated with the team
+                            dbHandler.deleteTasksByTeamId(teamId);
+                            dbHandler.deleteProjectsByTeamId(teamId); // Используем правильный метод
+                            dbHandler.deleteTeamById(teamId);
                         }
                     }
-                    // Если в команде только текущий пользователь или она пуста, ничего дополнительно не делаем
-                } else {
-                    // Получаем администратора команды
-                    User admin = dbHandler.getAdminOfTeam();
-                    if (admin != null) {
-                        // Переназначаем задачи администратору
-                        List<Task> userTasks = dbHandler.getTasksByUserId(currentUser.getId());
+                }
+            } else {
+                // For non-admins: check if there are tasks to reassign
+                if (teamId != -1) {
+                    List<Task> userTasks = dbHandler.getTasksByUserId(currentUser.getId());
+                    if (!userTasks.isEmpty()) {
+                        // Find the admin of the current team
+                        User admin = dbHandler.getAdminOfTeam(teamId);
+                        if (admin == null || !admin.getUserRole().equalsIgnoreCase("Admin")) {
+                            showAlertOneButton("No valid administrator found for the team. Please contact support.");
+                            System.out.println("No valid admin found for team ID: " + teamId);
+                            return;
+                        }
+
+                        // Reassign tasks to the team admin
                         for (Task task : userTasks) {
                             dbHandler.reassignTask(task.getId(), admin.getId(), currentUser.getId());
                         }
                     }
                 }
-
-                // Удаляем записи из user_contacts, связанные с пользователем
-                dbHandler.deleteUserContactsByUserId(currentUser.getId());
-
-                // Удаляем пользователя
-                boolean isDeleted = dbHandler.deleteUserById(currentUser.getId());
-
-                if (isDeleted) {
-                    showSuccessAlert("Your profile has been successfully deleted.");
-                    System.out.println("User successfully deleted.");
-                    openNewWindow("loginWindow.fxml");
-                } else {
-                    showAlertOneButton("Failed to delete profile. Please try again.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                showAlertOneButton("An error occurred while deleting the profile: " + e.getMessage());
             }
-        } else {
-            System.out.println("Deletion canceled.");
+
+            // Удаляем пользователя из команды (если он в команде)
+            if (teamId != -1) {
+                dbHandler.removeUserFromTeam(teamId, currentUser.getId());
+            }
+
+            // Удаляем все зависимости пользователя
+            // 1. Удаляем задачи пользователя
+            dbHandler.deleteTasksByUserId(currentUser.getId());
+            // 2. Удаляем записи из user_contacts
+            dbHandler.deleteUserContactsByUserId(currentUser.getId());
+
+            // Удаляем пользователя из таблицы users
+            boolean isDeleted = dbHandler.deleteUserById(currentUser.getId());
+            if (isDeleted) {
+                showSuccessAlert("Your profile has been successfully deleted.");
+                System.out.println("User successfully deleted.");
+                // Очищаем сессию и переходим на окно логина
+                Session.getInstance().setLoggedInUser(null);
+                openNewWindow("loginWindow.fxml");
+            } else {
+                showAlertOneButton("Failed to delete profile. Please try again.");
+                System.out.println("Failed to delete user.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlertOneButton("An error occurred while deleting the profile: " + e.getMessage());
+            System.out.println("Error during deletion: " + e.getMessage());
         }
     }
 
@@ -417,16 +561,24 @@ public class SettingsController {
         // Создаем кастомный layout
         VBox content = new VBox(10);
         content.setPadding(new Insets(10));
-        content.setAlignment(Pos.CENTER); // Выравнивание содержимого VBox по центру
+        content.setAlignment(Pos.CENTER);
 
         // Создаем ChoiceBox с именами участников команды
         ChoiceBox<String> choiceBox = new ChoiceBox<>(teamMembersNames);
-        content.getChildren().addAll(new Label("Choice a member"), choiceBox);
+        // Устанавливаем значение по умолчанию (первый элемент, если список не пуст)
+        if (!teamMembersNames.isEmpty()) {
+            choiceBox.setValue(teamMembersNames.get(0));
+        }
+        content.getChildren().addAll(new Label("Choose a member to be the new admin"), choiceBox);
 
         // Создаем диалоговое окно
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Select New Admin");
         dialog.getDialogPane().setContent(content);
+
+        Image icon = new Image(getClass().getResourceAsStream("/com/example/planify/images/user.png"));
+        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(icon);
 
         // Добавляем кнопки OK и Cancel
         ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
@@ -513,7 +665,7 @@ public class SettingsController {
     }
 
     private void showAlertOneButton(String message) {
-        Alert alert = createAlert(Alert.AlertType.WARNING, "Error", null, message);
+        Alert alert = createAlert(Alert.AlertType.WARNING, "Warning", null, message);
 
         // Устанавливаем иконку для окна диалога
         Image icon = new Image(getClass().getResourceAsStream("/com/example/planify/images/iconWarning.png"));
@@ -572,49 +724,65 @@ public class SettingsController {
 
         if (!newRole.equalsIgnoreCase("Admin")) {
             // Получаем список участников команды
-            ObservableList<User> teamMembers = dbHandler.loadTeamMembersByTeamId(dbHandler.getTeamIdByUserId(currentUser.getId()));
-            if (!teamMembers.isEmpty()) {
-                // Создаем список с именами и фамилиями участников
-                ObservableList<String> teamMembersNames = FXCollections.observableArrayList();
-                for (User member : teamMembers) {
+            int teamId = dbHandler.getTeamIdByUserId(currentUser.getId());
+            ObservableList<User> teamMembers = dbHandler.loadTeamMembersByTeamId(teamId);
+
+            // Проверяем, есть ли другие участники в команде
+            if (teamMembers.isEmpty() || (teamMembers.size() == 1 && teamMembers.get(0).getId() == currentUser.getId())) {
+                showAlertOneButton("There are no other team members to assign as admin. Role change cancelled.");
+                return null;
+            }
+
+            // Создаем список с именами и фамилиями участников, исключая текущего пользователя
+            ObservableList<String> teamMembersNames = FXCollections.observableArrayList();
+            for (User member : teamMembers) {
+                if (member.getId() != currentUser.getId()) { // Исключаем текущего пользователя
                     teamMembersNames.add(member.getFirstName() + " " + member.getLastName());
                 }
-
-                // Показываем диалоговое окно с выбором нового администратора
-                String newAdminName = showAdminSelectionDialog(teamMembersNames);
-                if (newAdminName != null) {
-                    // Разделяем имя и фамилию
-                    String[] nameParts = newAdminName.split(" ");
-                    if (nameParts.length == 2) {
-                        String firstName = nameParts[0];
-                        String lastName = nameParts[1];
-
-                        // Находим соответствующий объект User в базе данных
-                        newAdmin = dbHandler.getUserByFullName(firstName, lastName);
-
-                        if (newAdmin != null) {
-                            // Переназначаем статус администратора
-                            dbHandler.updateAdminRole(newAdmin.getId());
-
-                            // Обновляем запись в таблице teams
-                            int teamId = dbHandler.getTeamIdByUserId(currentUser.getId());
-                            dbHandler.updateTeamAdmin(teamId, newAdmin.getId());
-                        } else {
-                            // Если новый администратор не найден, отменяем изменение роли
-                            showAlertOneButton("Failed to update role. Please try again.");
-                            return null;
-                        }
-                    } else {
-                        // Если имя и фамилия не разделены корректно, отменяем изменение роли
-                        showAlertOneButton("Invalid name format. Please try again.");
-                        return null;
-                    }
-                } else {
-                    // Если новый администратор не выбран, отменяем изменение роли
-                    showAlertOneButton("No new admin selected. Role change cancelled.");
-                    return null;
-                }
             }
+
+            // Если после исключения текущего пользователя список пуст, отменяем изменение роли
+            if (teamMembersNames.isEmpty()) {
+                showAlertOneButton("There are no other team members to assign as admin. Role change cancelled.");
+                return null;
+            }
+
+            // Показываем диалоговое окно с выбором нового администратора
+            String newAdminName = showAdminSelectionDialog(teamMembersNames);
+            if (newAdminName == null) {
+                // Если новый администратор не выбран, отменяем изменение роли
+                showAlertOneButton("No new admin selected. Role change cancelled.");
+                return null;
+            }
+
+            // Разделяем имя и фамилию
+            String[] nameParts = newAdminName.split(" ");
+            if (nameParts.length != 2) {
+                showAlertOneButton("Invalid name format. Please try again.");
+                return null;
+            }
+
+            String firstName = nameParts[0];
+            String lastName = nameParts[1];
+
+            // Находим соответствующий объект User в базе данных
+            newAdmin = dbHandler.getUserByFullName(firstName, lastName);
+            if (newAdmin == null) {
+                showAlertOneButton("Failed to update role. Please try again.");
+                return null;
+            }
+
+            // Проверяем, не является ли выбранный пользователь текущим пользователем
+            if (newAdmin.getId() == currentUser.getId()) {
+                showAlertOneButton("You cannot select yourself as the new admin. Role change cancelled.");
+                return null;
+            }
+
+            // Переназначаем статус администратора
+            dbHandler.updateAdminRole(newAdmin.getId());
+
+            // Обновляем запись в таблице teams
+            dbHandler.updateTeamAdmin(teamId, newAdmin.getId());
         }
         return newAdmin;
     }

@@ -93,6 +93,9 @@ public class TasksController {
     @FXML
     private ListView tasksToDoListViewBack, tasksInProgressListViewBack, tasksCompletedListViewBack;
 
+    @FXML
+    private CheckBox checkBoxOnlyMyTasks;
+
     private AvatarHandler avatarHandler;
 
     @FXML
@@ -106,16 +109,62 @@ public class TasksController {
         setupUIElements();
         setupEventListeners();
         setupSelectionHandlers();
-        populateProjectChoiceBox(currentUser);
 
-        // Загружаем последний открытый проект
-        String lastOpenedProject = Session.getInstance().getLastOpenedProject();
-        if (lastOpenedProject != null) {
-            tasksChoiceBoxProject.setValue(lastOpenedProject);
-            loadTasksForProject(lastOpenedProject);
+
+        // Получаем teamId пользователя
+        int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+
+        // Проверяем, что пользователь состоит в команде
+        if (teamId != -1) {
+            populateProjectChoiceBox(currentUser);
+
+            // Загружаем последний открытый проект только если пользователь в команде
+            String lastOpenedProject = Session.getInstance().getLastOpenedProject();
+            if (lastOpenedProject != null) {
+                // Дополнительно проверяем, что проект принадлежит команде пользователя
+                if (isProjectBelongsToTeam(lastOpenedProject, teamId)) {
+                    tasksChoiceBoxProject.setValue(lastOpenedProject);
+                    loadTasksForProject(lastOpenedProject);
+                } else {
+                    // Очищаем последний открытый проект, если он не принадлежит текущей команде
+                    Session.getInstance().setLastOpenedProject(null);
+                }
+            }
+
+            handleProjectSelection();
+        } else {
+            // Пользователь не в команде - очищаем список проектов и отключаем элементы управления
+            tasksChoiceBoxProject.getItems().clear();
+            tasksChoiceBoxProject.setDisable(true);
+            ButtonCreateTask.setDisable(true);
+            ButtonEditTask.setDisable(true);
+            ButtonDeleteTask.setDisable(true);
+
+            // Показываем сообщение пользователю
+            showAlertOneButton("You are not a member of any team. Join a team to work on projects.");
         }
 
-        handleProjectSelection();
+        // Устанавливаем начальную видимость кнопок
+        updateButtonVisibilityBasedOnSelection();
+
+        // Настраиваем слушатель для CheckBox
+        checkBoxOnlyMyTasks.setOnAction(event -> {
+            String selectedProject = (String) tasksChoiceBoxProject.getValue();
+            if (selectedProject != null) {
+                loadTasksForProject(selectedProject); // Перезагружаем задачи с учётом фильтра
+            }
+        });
+    }
+
+    // Метод для проверки принадлежности проекта к команде
+    private boolean isProjectBelongsToTeam(String projectName, int teamId) {
+        DatabaseHandler dbHandler = new DatabaseHandler();
+        int projectId = dbHandler.getProjectIdByName(projectName);
+        if (projectId != -1) {
+            int projectTeamId = dbHandler.getTeamIdByProjectId(projectId);
+            return projectTeamId == teamId;
+        }
+        return false;
     }
 
     // Устанавливаем данные текущего пользователя
@@ -205,8 +254,6 @@ public class TasksController {
         TextField nameField = dialog.getEditor();
         nameField.setPromptText("Task Name");
 
-        ChoiceBox<String> projectChoiceBox = new ChoiceBox<>();
-
         DatePicker deadlinePicker = new DatePicker();
         deadlinePicker.setPromptText("Deadline");
 
@@ -215,14 +262,11 @@ public class TasksController {
 
         User currentUser = Session.getInstance().getLoggedInUser();
         int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
-        ObservableList<String> projectNames = new DatabaseHandler().loadProjectsByTeamId(teamId);
-        projectChoiceBox.getItems().addAll(projectNames);
 
         VBox content = new VBox(10);
         content.setPadding(new Insets(10));
         content.getChildren().addAll(
                 new Label("Name:"), nameField,
-                new Label("Project:"), projectChoiceBox,
                 new Label("Deadline:"), deadlinePicker
         );
 
@@ -246,7 +290,7 @@ public class TasksController {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == createButtonType) {
                 String taskName = nameField.getText().trim();
-                String selectedProject = projectChoiceBox.getValue();
+                String selectedProject = tasksChoiceBoxProject.getValue().toString(); // Берем текущий проект с формы
                 LocalDate deadline = deadlinePicker.getValue();
                 String assigneeName = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ? assigneeChoiceBox.getValue() : currentUser.getFirstName() + " " + currentUser.getLastName();
                 String assigneeFirstName = currentUser.getFirstName();
@@ -283,7 +327,7 @@ public class TasksController {
                     VBox taskBlock = createTaskBlock(taskName, deadline, assigneeName);
                     addTaskBlockToColumn(taskBlock, "To Do"); // Добавляем в VBox "To Do"
 
-                    //Отправка сообщения пользователю на почту
+                    // Отправка сообщения пользователю на почту
                     EmailSender emailSender = new EmailSender();
                     String emailAssignee = new DatabaseHandler().getUserEmailById(assigneeId);
                     emailSender.EmailSend(emailAssignee, assigneeName, "You have a new task!\nTo do: " + taskName + "\nDeadline: " + deadline);
@@ -627,6 +671,16 @@ public class TasksController {
 
                 // Сохраняем выбранный проект в сессии
                 Session.getInstance().setLastOpenedProject(selectedProject);
+
+                // Показываем только кнопку "Create Task", скрываем остальные
+                ButtonCreateTask.setVisible(true);
+                ButtonEditTask.setVisible(false);
+                ButtonDeleteTask.setVisible(false);
+            } else {
+                // Если проект не выбран, скрываем все кнопки
+                ButtonCreateTask.setVisible(false);
+                ButtonEditTask.setVisible(false);
+                ButtonDeleteTask.setVisible(false);
             }
         });
     }
@@ -635,10 +689,32 @@ public class TasksController {
         int projectId = new DatabaseHandler().getProjectIdByName(projectName);
         if (projectId != -1) {
             ObservableList<Task> tasks = new DatabaseHandler().loadTasksByProjectId(projectId);
+            User currentUser = Session.getInstance().getLoggedInUser();
+            int userId = currentUser.getId();
+
+            clearTaskColumns(); // Очищаем колонки перед загрузкой
 
             for (Task task : tasks) {
-                VBox taskBlock = createTaskBlock(task.getTitle(), task.getDeadline(), task.getAssigneeName());
-                addTaskBlockToColumn(taskBlock, task.getStatus());
+                // Преобразуем assignedTo (строка с userId) в int
+                int assigneeId;
+                try {
+                    assigneeId = Integer.parseInt(task.getAssignedTo());
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid assignee ID format for task: " + task.getTitle() + ", assignee: " + task.getAssignedTo());
+                    continue; // Пропускаем задачу с некорректным ID
+                }
+
+                // Проверяем, нужно ли фильтровать по текущему пользователю
+                if (!checkBoxOnlyMyTasks.isSelected() || assigneeId == userId) {
+                    // Получаем имя исполнителя для отображения
+                    String assigneeName = task.getAssignedTo(); // Используем как временное решение, но лучше получить имя через DB
+                    DatabaseHandler dbHandler = new DatabaseHandler();
+                    assigneeName = dbHandler.getUserNameById(assigneeId); // Получаем имя по userId
+                    if (assigneeName == null) assigneeName = "Unknown"; // Если имя не найдено
+
+                    VBox taskBlock = createTaskBlock(task.getTitle(), task.getDeadline(), assigneeName);
+                    addTaskBlockToColumn(taskBlock, task.getStatus());
+                }
             }
         } else {
             showAlertOneButton("Selected project does not exist.");
@@ -659,6 +735,15 @@ public class TasksController {
             if (newSelection != null) {
                 tasksInProgressListViewBack.getSelectionModel().clearSelection();
                 tasksCompletedListViewBack.getSelectionModel().clearSelection();
+
+                // Если задача выбрана и проект выбран, показываем кнопки "Edit" и "Delete"
+                if (tasksChoiceBoxProject.getValue() != null) {
+                    ButtonCreateTask.setVisible(true); // "Create Task" остаётся видимой
+                    ButtonEditTask.setVisible(true);
+                    ButtonDeleteTask.setVisible("Admin".equalsIgnoreCase(Session.getInstance().getLoggedInUser().getUserRole()));
+                }
+            } else {
+                updateButtonVisibilityBasedOnSelection();
             }
         });
 
@@ -666,6 +751,15 @@ public class TasksController {
             if (newSelection != null) {
                 tasksToDoListViewBack.getSelectionModel().clearSelection();
                 tasksCompletedListViewBack.getSelectionModel().clearSelection();
+
+                // Если задача выбрана и проект выбран, показываем кнопки "Edit" и "Delete"
+                if (tasksChoiceBoxProject.getValue() != null) {
+                    ButtonCreateTask.setVisible(true); // "Create Task" остаётся видимой
+                    ButtonEditTask.setVisible(true);
+                    ButtonDeleteTask.setVisible("Admin".equalsIgnoreCase(Session.getInstance().getLoggedInUser().getUserRole()));
+                }
+            } else {
+                updateButtonVisibilityBasedOnSelection();
             }
         });
 
@@ -673,7 +767,33 @@ public class TasksController {
             if (newSelection != null) {
                 tasksToDoListViewBack.getSelectionModel().clearSelection();
                 tasksInProgressListViewBack.getSelectionModel().clearSelection();
+
+                // Если задача выбрана и проект выбран, показываем кнопки "Edit" и "Delete"
+                if (tasksChoiceBoxProject.getValue() != null) {
+                    ButtonCreateTask.setVisible(true); // "Create Task" остаётся видимой
+                    ButtonEditTask.setVisible(true);
+                    ButtonDeleteTask.setVisible("Admin".equalsIgnoreCase(Session.getInstance().getLoggedInUser().getUserRole()));
+                }
+            } else {
+                updateButtonVisibilityBasedOnSelection();
             }
         });
+    }
+
+    private void updateButtonVisibilityBasedOnSelection() {
+        boolean isTaskSelected = tasksToDoListViewBack.getSelectionModel().getSelectedItem() != null ||
+                tasksInProgressListViewBack.getSelectionModel().getSelectedItem() != null ||
+                tasksCompletedListViewBack.getSelectionModel().getSelectedItem() != null;
+
+        if (tasksChoiceBoxProject.getValue() != null) {
+            ButtonCreateTask.setVisible(true); // "Create Task" видима, если проект выбран
+            ButtonEditTask.setVisible(isTaskSelected); // "Edit Task" видима только если выбрана задача
+            ButtonDeleteTask.setVisible(isTaskSelected && "Admin".equalsIgnoreCase(Session.getInstance().getLoggedInUser().getUserRole())); // "Delete Task" видима только для админа и если выбрана задача
+        } else {
+            // Если проект не выбран, скрываем все кнопки
+            ButtonCreateTask.setVisible(false);
+            ButtonEditTask.setVisible(false);
+            ButtonDeleteTask.setVisible(false);
+        }
     }
 }

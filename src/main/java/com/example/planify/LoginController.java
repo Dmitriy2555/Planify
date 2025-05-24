@@ -109,7 +109,6 @@ public class LoginController {
         textField.setTooltip(tooltip);
     }
 
-    // Логика входа в систему
     private void loginUser(String loginText, String passwordText) {
         DatabaseHandler dbHandler = new DatabaseHandler();
 
@@ -127,7 +126,14 @@ public class LoginController {
             if (result.next()) {
                 User loggedInUser = createUserFromResult(result);
                 Session.getInstance().setLoggedInUser(loggedInUser);
-                openNewWindow("dashboardWindow.fxml");
+
+                // Проверяем, состоит ли пользователь в команде, используя ID из loggedInUser
+                int teamId = new DatabaseHandler().getTeamIdByUserId(loggedInUser.getId());
+                if (teamId != -1) {
+                    openNewWindow("dashboardWindow.fxml");
+                } else {
+                    openNewWindow("teamWindow.fxml");
+                }
             } else {
                 // Логин существует, но пароль не совпал
                 new Shake(passwordField).playAnim();

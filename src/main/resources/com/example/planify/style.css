@@ -265,6 +265,16 @@
     -fx-opacity: 0;
 }
 
+.stackPaneBackInTeam {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-width: 1;
+    /* Сделаем фон серее с прозрачностью */
+    -fx-background-color: rgba(97, 97, 97, 0.25); /* чуть более серый и чуть более прозрачный */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
+
 /* Projects - стиль кнопки New */
 .button-new {
     -fx-background-color: #89c248; /* Мягкий зеленый цвет */
@@ -314,15 +324,15 @@
     -fx-background-color: #cc9900; /* Еще темнее при нажатии */
 }
 
-/* Tasks - стиль заголовков Planned, In Progress, Completed */
 .tasks-header {
-    -fx-font-size: 16px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
     -fx-alignment: center;
-    -fx-padding: 10;
+    -fx-padding: 4 10 4 10;        /* уменьшен отступ сверху и снизу */
     -fx-max-width: Infinity;
-    -fx-background-radius: 15;
+    /* Скругление только верхних углов */
+    -fx-background-radius: 15 15 0 0;
 }
 
 /* Стиль полей ввода, Profile Settings */

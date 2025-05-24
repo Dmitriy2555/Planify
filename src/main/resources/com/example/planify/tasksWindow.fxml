@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -49,11 +50,11 @@
                 </VBox>
             </children>
         </AnchorPane>
-      <HBox fx:id="tasksHboxBack" layoutX="255.0" layoutY="82.0" prefHeight="472.0" prefWidth="655.0">
+      <HBox fx:id="tasksHboxBack" layoutX="255.0" layoutY="54.0" prefHeight="466.0" prefWidth="655.0">
          <children>
             <VBox fx:id="tasksToDoVbox" prefHeight="472.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15;">
                <children>
-                  <Label fx:id="tittelToDo" prefHeight="18.0" prefWidth="262.0" style="-fx-background-color: #61605e;" styleClass="tasks-header" text="To Do">
+                  <Label fx:id="tittelToDo" prefHeight="18.0" prefWidth="218.0" style="-fx-background-color: #61605e;" styleClass="tasks-header" text="To Do">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -83,14 +84,15 @@
             </VBox>
          </children>
       </HBox>
-      <Button fx:id="ButtonCreateTask" layoutX="672.0" layoutY="28.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-save-button" stylesheets="@style.css" text="Create" />
-      <Button fx:id="ButtonDeleteTask" layoutX="542.0" layoutY="28.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-delete-button" stylesheets="@style.css" text="Delete" />
-      <Button fx:id="ButtonEditTask" layoutX="798.0" layoutY="28.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-edit-button" stylesheets="@style.css" text="Edit" />
-      <Label fx:id="tasksProjectChooseLabel" layoutX="255.0" layoutY="35.0" styleClass="label" text="Choose a project:">
+      <Button fx:id="ButtonCreateTask" layoutX="527.0" layoutY="531.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-save-button" stylesheets="@style.css" text="Create" />
+      <Button fx:id="ButtonDeleteTask" layoutX="742.0" layoutY="531.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-delete-button" stylesheets="@style.css" text="Delete" />
+      <Button fx:id="ButtonEditTask" layoutX="313.0" layoutY="531.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" styleClass="neon-edit-button" stylesheets="@style.css" text="Edit" />
+      <Label fx:id="tasksProjectChooseLabel" layoutX="255.0" layoutY="18.0" styleClass="label" text="Choose a project:">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="tasksChoiceBoxProject" layoutX="378.0" layoutY="31.0" prefHeight="20.0" prefWidth="125.0" styleClass="choice-box-profile" stylesheets="@style.css" />
+      <ChoiceBox fx:id="tasksChoiceBoxProject" layoutX="377.0" layoutY="13.0" prefHeight="20.0" prefWidth="125.0" styleClass="choice-box-profile" stylesheets="@style.css" />
+      <CheckBox fx:id="checkBoxOnlyMyTasks" layoutX="798.0" layoutY="16.0" mnemonicParsing="false" text="My tasks only" textFill="WHITE" />
     </children>
 </AnchorPane>

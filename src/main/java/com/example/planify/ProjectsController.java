@@ -36,7 +36,8 @@ public class ProjectsController {
     private Button menuDashboard, menuNotifications, menuProjects, menuSettings, menuTasks, menuTeam, newProjectButton, editProjectButton, deleteProjectButton;
 
     @FXML
-    private Label dashboardEmailLabel, dashboardNameLabel, dashboardLabenSignOut, detailsNameOfProjectResultat, detailsStatusResultat, detailsDeadlineResultat;
+    private Label dashboardEmailLabel, dashboardNameLabel, dashboardLabenSignOut, detailsNameOfProjectResultat,
+            detailsStatusResultat, detailsTasksCreatedResultat, detailsCreationDateResultat, detailsTasksCompletedResultat, detailsTasksOverdueResultat;
 
     @FXML
     private ListView<String> projectsProjectsList, urgentTasksList;
@@ -68,6 +69,9 @@ public class ProjectsController {
         setupEventListeners();
         populateProjectsList(currentUser);
         setupSelectionHandlers();
+
+
+        urgentTasksList.setSelectionModel(null);
 
         // Обработчик выбора элемента в ListView
         // Добавляем обработчик событий для выбора проекта
@@ -114,7 +118,29 @@ public class ProjectsController {
 
         menuDashboard.setOnMouseClicked(event -> openNewWindow("dashboardWindow.fxml"));
         menuTeam.setOnMouseClicked(event -> openNewWindow("teamWindow.fxml"));
-        menuTasks.setOnMouseClicked(event -> openNewWindow("tasksWindow.fxml"));
+
+        User currentUser = Session.getInstance().getLoggedInUser();
+        menuTasks.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                DatabaseHandler dbHandler = new DatabaseHandler();
+                ObservableList<String> projects = dbHandler.loadProjectsByTeamId(teamId);
+                if (!projects.isEmpty()) {
+                    openNewWindow("tasksWindow.fxml");
+                    handleMenuClick(new ActionEvent(menuTasks, null)); // Активируем кнопку только при доступе
+                } else {
+                    String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                            "Please create a project first to work on tasks." :
+                            "No tasks available. Please ask your admin to create a project.";
+                    showAlertOneButton(message);
+                }
+            } else {
+                String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                        "Please create a team first to work on tasks." :
+                        "Please join the team first to work on tasks.";
+                showAlertOneButton(message);
+            }
+        });
         menuSettings.setOnMouseClicked(event -> openNewWindow("settingsWindow.fxml"));
     }
 
@@ -138,12 +164,26 @@ public class ProjectsController {
     // Обработчик смены активного меню
     @FXML
     private void handleMenuClick(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+        User currentUser = Session.getInstance().getLoggedInUser();
+        int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+
+        // Проверяем, является ли кнопка Tasks и есть ли доступ
+        if (clickedButton == menuTasks) {
+            if (teamId == -1) {
+                return; // Не меняем стиль, если команда не найдена
+            }
+            ObservableList<String> projects = new DatabaseHandler().loadProjectsByTeamId(teamId);
+            if (projects.isEmpty()) {
+                return; // Не меняем стиль, если нет проектов
+            }
+        }
+
         if (activeButton != null) {
             activeButton.getStyleClass().remove("button-menu-active");
             activeButton.getStyleClass().add("button-menu");
         }
 
-        Button clickedButton = (Button) event.getSource();
         clickedButton.getStyleClass().remove("button-menu");
         clickedButton.getStyleClass().add("button-menu-active");
 
@@ -230,6 +270,22 @@ public class ProjectsController {
                     populateProjectsList(Session.getInstance().getLoggedInUser());
                     // Сбрасываем детали проекта
                     resetDetails();
+
+                    // Очищаем список незавершенных задач
+                    if (urgentTasksList != null) {
+                        urgentTasksList.getItems().clear();
+                    }
+
+                    // Очищаем статистику
+                    if (detailsTasksCreatedResultat != null) {
+                        detailsTasksCreatedResultat.setText("0");
+                    }
+                    if (detailsTasksCompletedResultat != null) {
+                        detailsTasksCompletedResultat.setText("0");
+                    }
+                    if (detailsTasksOverdueResultat != null) {
+                        detailsTasksOverdueResultat.setText("0");
+                    }
                 } else {
                     showAlertOneButton("Failed to delete the project. Please try again.");
                 }
@@ -399,31 +455,38 @@ public class ProjectsController {
         if ("Admin".equalsIgnoreCase(currentUser.getUserRole()) && isProjectSelected) {
             editProjectButton.setVisible(true);
             deleteProjectButton.setVisible(true);
-        }
-        else
-        {
+        } else {
             editProjectButton.setVisible(false);
             deleteProjectButton.setVisible(false);
         }
+
         // Обновляем детали проекта только если проект выбран
         if (isProjectSelected) {
             detailsNameOfProjectResultat.setText(selectedProject);
             DatabaseHandler dbHandler = new DatabaseHandler();
             detailsStatusResultat.setText(dbHandler.getProjectStatus(selectedProject));
-            detailsDeadlineResultat.setText(String.valueOf(getCreatedTaskFromProject()));
+            detailsCreationDateResultat.setText(dbHandler.getCreationDate(selectedProject) != null ?
+                    dbHandler.getCreationDate(selectedProject).toString() : "-");
+            detailsTasksCreatedResultat.setText(String.valueOf(getCreatedTaskFromProject()));
+            detailsTasksCompletedResultat.setText(String.valueOf(getCompletedTaskFromProject()));
+            detailsTasksOverdueResultat.setText(String.valueOf(getOverdueTaskFromProject()));
         } else {
             // Очищаем поля, если проект не выбран
             detailsNameOfProjectResultat.setText("");
             detailsStatusResultat.setText("");
-            detailsDeadlineResultat.setText("");
+            detailsCreationDateResultat.setText("");
+            detailsTasksCreatedResultat.setText("");
+            detailsTasksCompletedResultat.setText("");
+            detailsTasksOverdueResultat.setText("");
         }
     }
 
     private void resetDetails() {
-        detailsNameOfProjectResultat.setText("Name: ");
-        detailsStatusResultat.setText("Status: ");
+        detailsNameOfProjectResultat.setText("");
+        detailsStatusResultat.setText("");
         editProjectButton.setVisible(false);
         deleteProjectButton.setVisible(false);
+        detailsCreationDateResultat.setText("");
     }
 
     // Метод для загрузки задач по выбранному проекту
@@ -467,25 +530,53 @@ public class ProjectsController {
         return 0;
     }
 
+    private int getCompletedTaskFromProject() {
+        String selectedProject = projectsProjectsList.getSelectionModel().getSelectedItem();
+        if (selectedProject != null) {
+            DatabaseHandler dbHandler = new DatabaseHandler();
+            int projectId = dbHandler.getProjectIdByName(selectedProject);
+            if (projectId != -1) {
+                return dbHandler.getCompletedTaskByProjectId(projectId);
+            }
+        }
+        return 0;
+    }
+
+    private int getOverdueTaskFromProject() {
+        String selectedProject = projectsProjectsList.getSelectionModel().getSelectedItem();
+        if (selectedProject != null) {
+            DatabaseHandler dbHandler = new DatabaseHandler();
+            int projectId = dbHandler.getProjectIdByName(selectedProject);
+            if (projectId != -1) {
+                return dbHandler.getOverdueTaskByProjectId(projectId);
+            }
+        }
+        return 0;
+    }
+
     // Метод для установки обработчиков выбора
     private void setupSelectionHandlers() {
-        // Устанавливаем обработчики выбора для каждого ListView
+        // Обработчик для projectsProjectsList
         projectsProjectsList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                urgentTasksList.getSelectionModel().clearSelection();
+                // Не очищаем urgentTasksList, если выбор отключен
+                // urgentTasksList.getSelectionModel().clearSelection(); // Убираем эту строку
             }
 
             editProjectButton.setVisible(true);
             deleteProjectButton.setVisible(true);
         });
 
-        urgentTasksList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                projectsProjectsList.getSelectionModel().clearSelection();
-            }
+        // Обработчик для urgentTasksList (если выбор нужен)
+        if (urgentTasksList.getSelectionModel() != null) { // Проверяем наличие модели выбора
+            urgentTasksList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    projectsProjectsList.getSelectionModel().clearSelection();
+                }
 
-            editProjectButton.setVisible(false);
-            deleteProjectButton.setVisible(false);
-        });
+                editProjectButton.setVisible(false);
+                deleteProjectButton.setVisible(false);
+            });
+        }
     }
 }

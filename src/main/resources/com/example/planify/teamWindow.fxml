@@ -5,9 +5,11 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="960.0" styleClass="anchor-pane-dashboard" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.planify.TeamController">
     <children>
@@ -69,5 +71,15 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </Label>
+      <StackPane fx:id="welcomeStackPaneBack" layoutX="246.0" layoutY="34.0" prefHeight="454.0" prefWidth="668.0" styleClass="stackPaneBackInTeam" stylesheets="@style.css">
+         <children>
+            <Text fx:id="welcomeLabel" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="welcomeLabelInTeam" text="Welcome to Planify!" wrappingWidth="309.74700927734375">
+               <font>
+                  <Font size="35.0" />
+               </font>
+            </Text>
+         </children>
+      </StackPane>
+      <Button fx:id="createTeamButton" layoutX="500.0" layoutY="512.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="158.0" styleClass="neon-save-button" stylesheets="@style.css" text="CreateTeam" />
     </children>
 </AnchorPane>

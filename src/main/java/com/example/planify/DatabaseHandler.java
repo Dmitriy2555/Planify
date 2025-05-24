@@ -538,17 +538,64 @@ public class DatabaseHandler extends Configuration {
 
 
     // Creates a new team and adds a record to the teams table.
-    public void createTeam(String teamName, int adminId) {
-        String insert = "INSERT INTO " + Constant.TEAM_TABLE + " (" +
-                Constant.TEAM_NAME + ", " + Constant.TEAM_ADMIN_ID + ") VALUES (?, ?)";
+    public void createTeam(String teamName, int adminId) throws SQLException, ClassNotFoundException {
+        String checkQuery = "SELECT COUNT(*) FROM " + Constant.TEAM_TABLE + " WHERE " + Constant.TEAM_NAME + " = ?";
+        String insert = "INSERT INTO " + Constant.TEAM_TABLE + " (" + Constant.TEAM_NAME + ", " + Constant.TEAM_ADMIN_ID + ") VALUES (?, ?)";
 
-        try (PreparedStatement prSt = getDbConnection().prepareStatement(insert)) {
-            prSt.setString(1, teamName); // Устанавливаем название команды
-            prSt.setInt(2, adminId);     // Устанавливаем ID администратора
-            prSt.executeUpdate();        // Выполняем SQL-запрос
+        try (Connection conn = getDbConnection();
+             PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+             PreparedStatement prSt = conn.prepareStatement(insert)) {
+
+            // Check if team name already exists
+            checkStmt.setString(1, teamName);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                throw new SQLException("Team name '" + teamName + "' already exists.");
+            }
+
+            // If no duplicate, proceed with insertion
+            prSt.setString(1, teamName);
+            prSt.setInt(2, adminId);
+            prSt.executeUpdate();
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace(); // Вывод ошибки в случае неудачи
+            if (e.getMessage().contains("already exists")) {
+                System.err.println("Error: Team name already exists.");
+                throw e; // Or handle it in the UI, e.g., show an alert
+            }
+            e.printStackTrace();
         }
+    }
+
+    // Deletes a team by team ID
+    public void deleteTeamById(int teamId) {
+        String deleteQuery = "DELETE FROM teams WHERE id = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement pstmt = connection.prepareStatement(deleteQuery)) {
+            pstmt.setInt(1, teamId);
+            pstmt.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Метод должен быть добавлен в класс DatabaseHandler
+    public Integer getTeamIdByProjectId(int projectId) {
+        String query = "SELECT team_id FROM projects WHERE id = ?";
+
+        try (Connection connection = getDbConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, projectId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getInt("team_id");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     // Adds a user to a team by inserting a record into the team_members table.
@@ -581,6 +628,23 @@ public class DatabaseHandler extends Configuration {
         }
     }
 
+    // Проверяет, существует ли команда с таким именем
+    public boolean doesTeamNameExist(String teamName, int excludeTeamId) {
+        String query = "SELECT COUNT(*) FROM teams WHERE team_name = ? AND id != ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, teamName);
+            pstmt.setInt(2, excludeTeamId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     // Updates the name of a team.
     public void updateTeamName(int teamId, String newName) {
         String query = "UPDATE " + Constant.TEAM_TABLE + " SET " + Constant.TEAM_NAME + " = ? WHERE id = ?";
@@ -595,12 +659,13 @@ public class DatabaseHandler extends Configuration {
         }
     }
 
-    // Retrieves the admin of a team.
-    public User getAdminOfTeam() {
-        String selectQuery = "SELECT * FROM users WHERE role = 'Admin' LIMIT 1";
+    // Retrieves the admin of a specific team by teamId
+    public User getAdminOfTeam(int teamId) {
+        String selectQuery = "SELECT u.* FROM users u JOIN teams t ON u.id = t.admin_id WHERE t.id = ? AND u.role = 'Admin'";
         try (Connection connection = getDbConnection();
              PreparedStatement pstmt = connection.prepareStatement(selectQuery)) {
 
+            pstmt.setInt(1, teamId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 User admin = new User();
@@ -674,15 +739,16 @@ public class DatabaseHandler extends Configuration {
     // Creates a new project and adds a record to the projects table.
     public boolean createProject(String projectName, int teamId) {
         String insert = "INSERT INTO " + Constant.PROJECT_TABLE + " (" +
-                Constant.PROJECT_NAME + ", " + Constant.PROJECT_TEAM_ID + ", " + Constant.PROJECT_STATUS +
-                ") VALUES (?, ?, ?)";
+                Constant.PROJECT_NAME + ", " + Constant.PROJECT_TEAM_ID + ", " + Constant.PROJECT_STATUS + ", " + Constant.CREATION_DATE +
+                ") VALUES (?, ?, ?, ?)";
 
         try (Connection connection = getDbConnection();
              PreparedStatement prSt = connection.prepareStatement(insert)) {
 
-            prSt.setString(1, projectName); // Устанавливаем название проекта
-            prSt.setInt(2, teamId);         // Устанавливаем ID команды
-            prSt.setString(3, "Planned");   // Устанавливаем статус "Planned"
+            prSt.setString(1, projectName);         // Устанавливаем название проекта
+            prSt.setInt(2, teamId);                 // Устанавливаем ID команды
+            prSt.setString(3, "Planned");           // Устанавливаем статус "Planned"
+            prSt.setDate(4, new java.sql.Date(System.currentTimeMillis())); // Устанавливаем текущую дату
             int affectedRows = prSt.executeUpdate(); // Выполняем SQL-запрос
 
             return affectedRows > 0; // Возвращаем true, если запись добавлена
@@ -737,6 +803,18 @@ public class DatabaseHandler extends Configuration {
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    // Deletes all projects associated with a team by team ID
+    public void deleteProjectsByTeamId(int teamId) {
+        String deleteQuery = "DELETE FROM projects WHERE team_id = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement pstmt = connection.prepareStatement(deleteQuery)) {
+            pstmt.setInt(1, teamId);
+            pstmt.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -805,6 +883,51 @@ public class DatabaseHandler extends Configuration {
         return projectList;
     }
 
+    public int getCompletedTaskByProjectId(int projectId) {
+        String query = "SELECT COUNT(*) FROM tasks WHERE project_id = ? AND status = 'Completed'";
+        try (Connection connection = getDbConnection();
+             PreparedStatement prSt = connection.prepareStatement(query)) {
+            prSt.setInt(1, projectId);
+            ResultSet rs = prSt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getOverdueTaskByProjectId(int projectId) {
+        String query = "SELECT COUNT(*) FROM tasks WHERE project_id = ? AND deadline < CURDATE() AND status != 'Completed'";
+        try (Connection connection = getDbConnection();
+             PreparedStatement prSt = connection.prepareStatement(query)) {
+            prSt.setInt(1, projectId);
+            ResultSet rs = prSt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public Date getCreationDate(String projectName) {
+        String query = "SELECT creation_date FROM projects WHERE name = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement prSt = connection.prepareStatement(query)) {
+            prSt.setString(1, projectName);
+            ResultSet rs = prSt.executeQuery();
+            if (rs.next()) {
+                return rs.getDate("creation_date");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // Creates a new task and adds a record to the tasks table.
     public boolean createTask(String title, int projectId, LocalDate deadline, int assigneeId, int createdById) {
         String insert = "INSERT INTO tasks (project_id, assigned_to, title, status, created_by, deadline) " +
@@ -826,6 +949,31 @@ public class DatabaseHandler extends Configuration {
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    // Deletes all tasks associated with a team by team ID
+    public void deleteTasksByTeamId(int teamId) {
+        String deleteQuery = "DELETE FROM tasks WHERE project_id IN (SELECT id FROM projects WHERE team_id = ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement pstmt = connection.prepareStatement(deleteQuery)) {
+            pstmt.setInt(1, teamId);
+            pstmt.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Deletes all tasks assigned to a user by user ID
+    public void deleteTasksByUserId(int userId) {
+        String deleteQuery = "DELETE FROM tasks WHERE assigned_to = ? OR created_by = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement pstmt = connection.prepareStatement(deleteQuery)) {
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

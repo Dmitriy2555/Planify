@@ -121,7 +121,7 @@
                   <Font name="System Bold" size="19.0" />
                </font>
             </Label>
-            <ListView fx:id="dashboardTasksList" layoutY="34.0" prefHeight="187.0" prefWidth="299.0" styleClass="dashboard-tasks-list" />
+            <ListView fx:id="dashboardTasksList" focusTraversable="false" layoutY="34.0" prefHeight="187.0" prefWidth="299.0" styleClass="dashboard-tasks-list" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="backgroundProjects" layoutX="249.0" layoutY="322.0" prefHeight="222.0" prefWidth="299.0" style="-fx-background-color: #61605e; -fx-background-radius: 20;">

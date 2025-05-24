@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import Animations.Shake;
+import javafx.animation.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,14 +19,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class TeamController {
 
@@ -38,12 +45,15 @@ public class TeamController {
     @FXML private TableColumn<User, String> columnRole;
     @FXML private Label dashboardEmailLabel;
     @FXML private Label dashboardLabenSignOut;
-    @FXML private Label dashboardNameLabel, teamIdResultat;
+    @FXML private Label dashboardNameLabel, teamIdResultat, teamName;
     @FXML private Button menuDashboard, menuProjects, menuSettings, menuTasks, menuTeam;
     @FXML private Button teamButtonRemoveUser, teamButtonJoinTeam, teamButtonLeaveTeam;
     @FXML private VBox vboxAvatarNameEmail, vboxMenu, vboxSignOut;
     @FXML private Circle circleBackAvatar;
-    @FXML private Button activeButton, teamButtonAddUser;
+    @FXML private Button activeButton, teamButtonAddUser, createTeamButton;
+    @FXML private StackPane welcomeStackPaneBack;
+    @FXML private Text welcomeLabel;
+
 
     private Team team; // Переменная для хранения команды
 
@@ -54,19 +64,19 @@ public class TeamController {
         User currentUser = Session.getInstance().getLoggedInUser();
         if (currentUser != null) {
             initializeUserData(currentUser);
-            configureInterface(currentUser);
+            // Убедимся, что команда загружается перед настройкой интерфейса
+            if ("Admin".equalsIgnoreCase(currentUser.getUserRole())) {
+                checkAndLoadTeam(currentUser); // Загружаем команду для админа
+            } else {
+                loadTeamForUser(currentUser); // Загружаем команду для обычного пользователя
+            }
+            configureInterface(currentUser); // Настраиваем интерфейс после загрузки команды
             avatarHandler = new AvatarHandler(circleBackAvatar, currentUser, false);
         }
 
         setupUIElements();
         setupEventListeners();
 
-        // Убедись, что команда загружается
-        if ("Admin".equalsIgnoreCase(currentUser.getUserRole())) {
-            checkAndLoadTeam(currentUser);
-        } else {
-            loadTeamForUser(currentUser); // Загружаем команду для обычных пользователей
-        }
     }
 
     private void initializeUserData(User user) {
@@ -80,26 +90,105 @@ public class TeamController {
         if ("Admin".equalsIgnoreCase(user.getUserRole())) {
             setupAdminInterface();
             setupTeamNameEdit();
+
+            // Динамическое обновление видимости кнопки "Remove user" при изменении выбора в таблице
+            adminTableTeam.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                updateButtonVisibilityForAdmin();
+            });
+
+            // Начальное обновление видимости
+            updateButtonVisibilityForAdmin();
         } else {
-            setupUserInterface();
+            loadTeamForUser(user); // Загружаем данные команды для пользователя
+            setupUserInterface(user); // Настраиваем интерфейс с учётом состояния команды
         }
     }
 
-    private void setupAdminInterface() {
-        teamButtonAddUser.setVisible(true);
-        teamButtonRemoveUser.setVisible(true);
-        teamButtonJoinTeam.setVisible(false);
-        teamButtonLeaveTeam.setVisible(false);
-
-        teamButtonAddUser.setOnAction(e -> handleAddUser());
-        teamButtonRemoveUser.setOnAction(e -> handleRemoveUser());
+    private void updateButtonVisibilityForAdmin() {
+        boolean hasTeam = team != null;
+        boolean hasSelectedUser = adminTableTeam.getSelectionModel().getSelectedItem() != null;
+        teamButtonRemoveUser.setVisible(hasTeam && hasSelectedUser);
     }
 
-    private void setupUserInterface() {
+    private void updateButtonVisibilityForUser() {
+        boolean hasTeam = team != null;
+        teamButtonLeaveTeam.setVisible(hasTeam);
+    }
+
+    private void setupAdminInterface() {
+        // Проверяем, есть ли команда у админа
+        boolean hasTeam = (team != null);
+
+        if (!hasTeam) {
+            // Если команды нет: скрываем таблицу, надписи и кнопки, показываем приветствие
+            adminTableTeam.setVisible(false);
+            teamName.setVisible(false);
+            teamIdResultat.setVisible(false);
+            teamIdResultat.setText(""); // Очищаем текст, чтобы не осталось старых данных
+            teamButtonAddUser.setVisible(false);
+            teamButtonRemoveUser.setVisible(false);
+            teamButtonJoinTeam.setVisible(false);
+            teamButtonLeaveTeam.setVisible(false);
+            welcomeStackPaneBack.setVisible(true);
+            welcomeLabel.setVisible(true);
+            createTeamButton.setVisible(true); // Показываем кнопку создания команды
+        } else {
+            // Если команда есть: показываем таблицу, надписи и кнопки, скрываем приветствие
+            adminTableTeam.setVisible(true);
+            teamName.setVisible(true);
+            teamIdResultat.setVisible(true);
+            teamIdResultat.setText(team.getName()); // Устанавливаем имя команды
+            teamButtonAddUser.setVisible(true); // Показываем кнопку "Add User"
+            teamButtonRemoveUser.setVisible(adminTableTeam.getSelectionModel().getSelectedItem() != null); // Логика видимости для "Remove User"
+            teamButtonJoinTeam.setVisible(false);
+            teamButtonLeaveTeam.setVisible(false);
+            welcomeStackPaneBack.setVisible(false);
+            welcomeLabel.setVisible(false);
+            createTeamButton.setVisible(false); // Скрываем кнопку создания команды
+        }
+
+        // Настраиваем действия для кнопок
+        teamButtonAddUser.setOnAction(e -> handleAddUser());
+        teamButtonRemoveUser.setOnAction(e -> handleRemoveUser());
+        createTeamButton.setOnAction(e -> handleCreateTeam());
+    }
+
+    private void handleCreateTeam() {
+        User currentUser = Session.getInstance().getLoggedInUser();
+        if (currentUser != null) {
+            createNewTeam(currentUser); // Вызываем метод создания команды
+            // Перезагружаем данные команды и обновляем интерфейс
+            checkAndLoadTeam(currentUser); // Убедимся, что team обновлён
+            setupAdminInterface(); // Перестраиваем интерфейс с новым состоянием
+        }
+    }
+
+    private void setupUserInterface(User user) {
         teamButtonAddUser.setVisible(false);
         teamButtonRemoveUser.setVisible(false);
-        teamButtonJoinTeam.setVisible(true);
-        teamButtonLeaveTeam.setVisible(true);
+        createTeamButton.setVisible(false);
+
+        // Проверяем, есть ли команда для пользователя
+        boolean hasTeam = (team != null);
+        teamButtonJoinTeam.setVisible(!hasTeam);
+        teamButtonLeaveTeam.setVisible(hasTeam);
+        teamIdResultat.setVisible(hasTeam);
+        if (!hasTeam) {
+            teamName.setVisible(false);
+            teamIdResultat.setText(""); // Очищаем имя команды, если команды нет
+            // Делаем таблицу невидимой, а StackPane с надписью видимым
+            adminTableTeam.setVisible(false);
+            welcomeStackPaneBack.setVisible(true);
+            welcomeLabel.setVisible(true);
+        } else {
+            teamName.setVisible(true);
+            teamIdResultat.setText(team.getName()); // Устанавливаем имя команды
+
+            // Делаем таблицу видимой, а StackPane с надписью невидимым
+            adminTableTeam.setVisible(true);
+            welcomeStackPaneBack.setVisible(false);
+            welcomeLabel.setVisible(false);
+        }
 
         teamButtonJoinTeam.setOnAction(e -> handleJoinTeam());
         teamButtonLeaveTeam.setOnAction(e -> handleLeaveTeam());
@@ -125,19 +214,27 @@ public class TeamController {
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(newName -> {
                 if (!newName.trim().isEmpty()) {
-
                     if (team == null) {
                         System.err.println("Ошибка: объект team не инициализирован");
                         return;
                     }
 
-                    teamIdResultat.setText(newName);
-
                     // Создаем экземпляр DatabaseHandler
                     DatabaseHandler dbHandler = new DatabaseHandler();
 
+                    // Проверяем, существует ли уже команда с таким именем (исключая текущую команду)
+                    if (dbHandler.doesTeamNameExist(newName, team.getId())) {
+                        showAlertOneButton("A team with the name '" + newName + "' already exists. Please choose a different name.");
+                        return;
+                    }
+
+                    teamIdResultat.setText(newName);
+
                     // Вызываем метод для обновления имени команды в БД
                     dbHandler.updateTeamName(team.getId(), newName);
+
+                    // Обновляем объект team
+                    team.setName(newName);
 
                     System.out.println("Team name changed to: " + newName);
                 } else {
@@ -163,20 +260,104 @@ public class TeamController {
         dashboardLabenSignOut.setOnMouseEntered(event -> dashboardLabenSignOut.setUnderline(true));
         dashboardLabenSignOut.setOnMouseExited(event -> dashboardLabenSignOut.setUnderline(false));
 
-        menuProjects.setOnMouseClicked(event -> openNewWindow("projectsWindow.fxml"));
-        menuDashboard.setOnMouseClicked(event -> openNewWindow("dashboardWindow.fxml"));
-        menuTasks.setOnMouseClicked(event -> openNewWindow("tasksWindow.fxml"));
-        menuSettings.setOnMouseClicked(event -> openNewWindow("settingsWindow.fxml"));
+        User currentUser = Session.getInstance().getLoggedInUser();
+        menuDashboard.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                openNewWindow("dashboardWindow.fxml");
+                handleMenuClick(new ActionEvent(menuDashboard, null)); // Активируем кнопку только при доступе
+            } else {
+                String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                        "Please create a team first to open a dashboard." :
+                        "Please join the team first to open on dashboard.";
+                showAlertOneButton(message);
+            }
+        });
+
+        menuProjects.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                DatabaseHandler dbHandler = new DatabaseHandler();
+                ObservableList<String> projects = dbHandler.loadProjectsByTeamId(teamId);
+                // Если пользователь — админ, он может открыть страницу даже без проектов
+                if ("Admin".equalsIgnoreCase(currentUser.getUserRole()) || !projects.isEmpty()) {
+                    openNewWindow("projectsWindow.fxml");
+                    handleMenuClick(new ActionEvent(menuProjects, null)); // Активируем кнопку только при доступе
+                } else {
+                    // Для не-админов: если проектов нет, показываем алерт
+                    showAlertOneButton("No projects available. Please ask your admin to create a project.");
+                }
+            } else {
+                showAlertOneButton("You are not a member of any team. Join a team to work on projects.");
+            }
+        });
+
+        menuTasks.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                DatabaseHandler dbHandler = new DatabaseHandler();
+                ObservableList<String> projects = dbHandler.loadProjectsByTeamId(teamId);
+                if (!projects.isEmpty()) {
+                    openNewWindow("tasksWindow.fxml");
+                    handleMenuClick(new ActionEvent(menuTasks, null)); // Активируем кнопку только при доступе
+                } else {
+                    String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                            "Please create a project first to work on tasks." :
+                            "No tasks available. Please ask your admin to create a project.";
+                    showAlertOneButton(message);
+                }
+            } else {
+                String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                        "Please create a team first to work on tasks." :
+                        "Please join the team first to work on tasks.";
+                showAlertOneButton(message);
+            }
+        });
+
+        menuTeam.setOnMouseClicked(event -> {
+            openNewWindow("teamWindow.fxml");
+            handleMenuClick(new ActionEvent(menuTeam, null)); // Без ограничений
+        });
+
+        menuSettings.setOnMouseClicked(event -> {
+            openNewWindow("settingsWindow.fxml");
+            handleMenuClick(new ActionEvent(menuSettings, null)); // Без ограничений
+        });
     }
 
     @FXML
     private void handleMenuClick(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+        User currentUser = Session.getInstance().getLoggedInUser();
+        int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+
+        // Проверяем, является ли кнопка одной из ограниченных и есть ли доступ
+        if ((clickedButton == menuDashboard || clickedButton == menuProjects || clickedButton == menuTasks) && teamId == -1) {
+            // Не меняем стиль, так как доступа нет
+            return;
+        }
+
+        // Дополнительная проверка для Tasks: нужны проекты
+        if (clickedButton == menuTasks) {
+            ObservableList<String> projects = new DatabaseHandler().loadProjectsByTeamId(teamId);
+            if (projects.isEmpty()) {
+                return; // Не меняем стиль, если нет проектов
+            }
+        }
+
+        // Дополнительная проверка для Projects: нужны проекты для не-админов
+        if (clickedButton == menuProjects && !"Admin".equalsIgnoreCase(currentUser.getUserRole())) {
+            ObservableList<String> projects = new DatabaseHandler().loadProjectsByTeamId(teamId);
+            if (projects.isEmpty()) {
+                return; // Не меняем стиль для не-админов, если нет проектов
+            }
+        }
+
         if (activeButton != null) {
             activeButton.getStyleClass().remove("button-menu-active");
             activeButton.getStyleClass().add("button-menu");
         }
 
-        Button clickedButton = (Button) event.getSource();
         clickedButton.getStyleClass().remove("button-menu");
         clickedButton.getStyleClass().add("button-menu-active");
 
@@ -233,7 +414,11 @@ public class TeamController {
                 showAlertOneButton("User with email \"" + email + "\" not found.");
             } else if (isUserInTable(user)) {
                 showAlertOneButton("User with email \"" + email + "\" is already added to the table.");
-            } else {
+            }
+            else if (user.getUserRole().equalsIgnoreCase("Admin")) {
+                showAlertOneButton("Cannot add a user with 'Admin' role to the team.");
+            }
+            else {
                 adminTableTeam.getItems().add(user);
                 adminTableTeam.refresh();
                 System.out.println("Добавлен: " + user.getFirstName());
@@ -262,16 +447,9 @@ public class TeamController {
     @FXML
     private void handleRemoveUser() {
         User selectedUser = adminTableTeam.getSelectionModel().getSelectedItem();
-
-        //получаем почту, куда будет отправлено сообщение
-        String toEmail = selectedUser.getUserEmail();
-        if (selectedUser == null) {
-            System.out.println("No user selected.");
-            new Shake(teamButtonRemoveUser).playAnim();
-            return;
-        }
-
         User currentUser = Session.getInstance().getLoggedInUser();
+
+        // Проверка на удаление самого себя (на всякий случай)
         if (selectedUser.getUserEmail().equals(currentUser.getUserEmail())) {
             System.out.println("You cannot remove yourself from the team.");
             showAlertOneButton("You cannot remove yourself from the team.");
@@ -286,25 +464,21 @@ public class TeamController {
 
             // Удаляем пользователя из команды в базе данных
             DatabaseHandler dbHandler = new DatabaseHandler();
-            if (team != null) {
-                dbHandler.removeUserFromTeam(team.getId(), selectedUser.getId());
-                showSuccessAlert(selectedUser.getFirstName() + " removed from team");
-                System.out.println("User removed from team in the database.");
+            dbHandler.removeUserFromTeam(team.getId(), selectedUser.getId());
+            showSuccessAlert(selectedUser.getFirstName() + " removed from team");
+            System.out.println("User removed from team in the database.");
 
-                //отправляем сообщение на почту
-                EmailSender emailSender = new EmailSender();
-                String firstName = selectedUser.getFirstName();
-                String nameOfTeam = teamIdResultat.getText();
-                emailSender.EmailSend(toEmail, firstName, "You have been removed from team.\nTeam name: " + nameOfTeam + "\nCheck your app!");
-            } else {
-                System.err.println("Ошибка: объект team не инициализирован");
-            }
+            // Отправляем сообщение на почту
+            EmailSender emailSender = new EmailSender();
+            String toEmail = selectedUser.getUserEmail();
+            String firstName = selectedUser.getFirstName();
+            String nameOfTeam = teamIdResultat.getText();
+            emailSender.EmailSend(toEmail, firstName, "You have been removed from team.\nTeam name: " + nameOfTeam + "\nCheck your app!");
         } else {
             System.out.println("Deletion cancelled.");
         }
     }
 
-    //присойдененик пользователей в команду
     @FXML
     private void handleJoinTeam() {
         TextInputDialog dialog = createTextInputDialog("Join Team", "Enter the team name to join:", "Team Name:");
@@ -325,9 +499,10 @@ public class TeamController {
                 User currentUser = Session.getInstance().getLoggedInUser();
                 dbHandler.addUserToTeam(dbHandler.getTeamIdByName(teamName), currentUser.getId(), currentUser.getUserRole());
                 loadTeamForUser(currentUser); // Обновляем интерфейс после присоединения к команде
+                setupUserInterface(currentUser); // Обновляем видимость кнопок
                 showSuccessAlert("You have successfully joined the team: " + teamName);
 
-                //отправляем сообщение на почту
+                // Отправляем сообщение на почту
                 EmailSender emailSender = new EmailSender();
                 String firstName = currentUser.getFirstName();
                 String toEmail = currentUser.getUserEmail();
@@ -339,22 +514,17 @@ public class TeamController {
     }
 
     @FXML
-    private void handleLeaveTeam()
-    {
-        if (team == null) {
-            showAlertOneButton("You are not in any team.");
-            return;
-        }
-
+    private void handleLeaveTeam() {
         if (showAlertTwoButton("Are you sure you want to leave the team?")) {
             User currentUser = Session.getInstance().getLoggedInUser();
             String nameOfTeam = teamIdResultat.getText();
             DatabaseHandler dbHandler = new DatabaseHandler();
             dbHandler.removeUserFromTeam(team.getId(), currentUser.getId());
             loadTeamForUser(currentUser); // Обновляем интерфейс после удаления из команды
+            setupUserInterface(currentUser); // Обновляем видимость кнопок
             showSuccessAlert("You have successfully left the team.");
 
-            //отправляем сообщение на почту
+            // Отправляем сообщение на почту
             EmailSender emailSender = new EmailSender();
             String firstName = currentUser.getFirstName();
             String toEmail = currentUser.getUserEmail();
@@ -364,7 +534,7 @@ public class TeamController {
     }
 
     private void showAlertOneButton(String message) {
-        Alert alert = createAlert(Alert.AlertType.WARNING, "Error", null, message);
+        Alert alert = createAlert(Alert.AlertType.WARNING, "Warning", null, message);
 
         // Устанавливаем иконку для окна диалога
         Image icon = new Image(getClass().getResourceAsStream("/com/example/planify/images/iconWarning.png"));
@@ -506,6 +676,8 @@ public class TeamController {
             } else {
                 System.out.println("No team found for the current user.");
                 teamIdResultat.setText("No team");
+                team = null; // Очищаем объект team
+                setupTeamTable(currentUser); // Очищаем таблицу
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -550,7 +722,7 @@ public class TeamController {
     }
 
     private void createNewTeam(User currentUser) {
-        TextInputDialog dialog = createTextInputDialog("Create Team", "Enter the new team name:", "Team name:");
+        TextInputDialog dialog = createTextInputDialog("Создать команду", "Enter the new team name:", "Team name:");
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(teamName -> {
             if (!teamName.trim().isEmpty()) {
@@ -558,22 +730,26 @@ public class TeamController {
                 System.out.println("Creating team with name: " + teamName + ", admin ID: " + adminId);
 
                 DatabaseHandler dbHandler = new DatabaseHandler();
-                dbHandler.createTeam(teamName, adminId);
-                teamIdResultat.setText(teamName);
-                System.out.println("Team created: " + teamName);
+                try {
+                    dbHandler.createTeam(teamName, adminId);
+                    teamIdResultat.setText(teamName);
+                    System.out.println("Team created: " + teamName);
 
-                // Загружаем команду после её создания
-                checkAndLoadTeam(currentUser);
+                    checkAndLoadTeam(currentUser);
 
-                // Добавляем админа в команду
-                if (team != null) {
-                    dbHandler.addUserToTeam(team.getId(), adminId, currentUser.getUserRole());
-                    setupTeamTable(currentUser);
-                    adminTableTeam.refresh();
-                    showSuccessAlert("Team successfully created");
-                    System.out.println("Admin added to the team.");
-                } else {
-                    System.err.println("Ошибка: объект team не инициализирован");
+                    if (team != null) {
+                        dbHandler.addUserToTeam(team.getId(), adminId, currentUser.getUserRole());
+                        setupTeamTable(currentUser);
+                        adminTableTeam.refresh();
+                        showSuccessAlert("Team successfully created");
+                        System.out.println("Admin added to the team.");
+                    } else {
+                        System.err.println("Team object not initialized");
+                    }
+                } catch (SQLException e) {
+                    showAlertOneButton("Team name '" + teamName + "' already exists.");
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
             } else {
                 showAlertOneButton("Team name cannot be empty.");

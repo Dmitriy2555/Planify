@@ -15,10 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
@@ -72,6 +69,11 @@ public class DashboardController {
         populateProjectLists(currentUser);
         setupSelectionHandlers();
 
+        // Отключаем выбор для dashboardTasksList
+        if (dashboardTasksList != null) {
+            dashboardTasksList.setSelectionModel(null); // Отключаем модель выбора
+        }
+
         // Добавляем обработчик событий для выбора проекта
         dashboardProjectsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -112,9 +114,50 @@ public class DashboardController {
         dashboardLabenSignOut.setOnMouseEntered(event -> dashboardLabenSignOut.setUnderline(true));
         dashboardLabenSignOut.setOnMouseExited(event -> dashboardLabenSignOut.setUnderline(false));
 
-        menuProjects.setOnMouseClicked(event -> openNewWindow("projectsWindow.fxml"));
+        User currentUser = Session.getInstance().getLoggedInUser();
+
+        menuProjects.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                DatabaseHandler dbHandler = new DatabaseHandler();
+                ObservableList<String> projects = dbHandler.loadProjectsByTeamId(teamId);
+                // Если пользователь — админ, он может открыть страницу даже без проектов
+                if ("Admin".equalsIgnoreCase(currentUser.getUserRole()) || !projects.isEmpty()) {
+                    openNewWindow("projectsWindow.fxml");
+                    handleMenuClick(new ActionEvent(menuProjects, null)); // Активируем кнопку только при доступе
+                } else {
+                    // Для не-админов: если проектов нет, показываем алерт
+                    showAlertOneButton("No projects available. Please ask your admin to create a project.");
+                }
+            } else {
+                showAlertOneButton("You are not a member of any team. Join a team to work on projects.");
+            }
+        });
+
         menuTeam.setOnMouseClicked(event -> openNewWindow("teamWindow.fxml"));
-        menuTasks.setOnMouseClicked(event -> openNewWindow("tasksWindow.fxml"));
+
+        menuTasks.setOnMouseClicked(event -> {
+            int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+            if (teamId != -1) {
+                DatabaseHandler dbHandler = new DatabaseHandler();
+                ObservableList<String> projects = dbHandler.loadProjectsByTeamId(teamId);
+                if (!projects.isEmpty()) {
+                    openNewWindow("tasksWindow.fxml");
+                    handleMenuClick(new ActionEvent(menuTasks, null)); // Активируем кнопку только при доступе
+                } else {
+                    String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                            "Please create a project first to work on tasks." :
+                            "No tasks available. Please ask your admin to create a project.";
+                    showAlertOneButton(message);
+                }
+            } else {
+                String message = "Admin".equalsIgnoreCase(currentUser.getUserRole()) ?
+                        "Please create a team first to work on tasks." :
+                        "Please join the team first to work on tasks.";
+                showAlertOneButton(message);
+            }
+        });
+
         menuSettings.setOnMouseClicked(event -> openNewWindow("settingsWindow.fxml"));
     }
 
@@ -138,12 +181,39 @@ public class DashboardController {
     // Обработчик смены активного меню
     @FXML
     private void handleMenuClick(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+        User currentUser = Session.getInstance().getLoggedInUser();
+        int teamId = new DatabaseHandler().getTeamIdByUserId(currentUser.getId());
+
+        // Проверяем, является ли кнопка Tasks и есть ли доступ
+        if (clickedButton == menuTasks) {
+            if (teamId == -1) {
+                return; // Не меняем стиль, если команда не найдена
+            }
+            ObservableList<String> projects = new DatabaseHandler().loadProjectsByTeamId(teamId);
+            if (projects.isEmpty()) {
+                return; // Не меняем стиль, если нет проектов
+            }
+        }
+
+        // Проверяем, является ли кнопка Projects и есть ли доступ для не-админов
+        if (clickedButton == menuProjects) {
+            if (teamId == -1) {
+                return; // Не меняем стиль, если команда не найдена
+            }
+            if (!"Admin".equalsIgnoreCase(currentUser.getUserRole())) {
+                ObservableList<String> projects = new DatabaseHandler().loadProjectsByTeamId(teamId);
+                if (projects.isEmpty()) {
+                    return; // Не меняем стиль для не-админов, если нет проектов
+                }
+            }
+        }
+
         if (activeButton != null) {
             activeButton.getStyleClass().remove("button-menu-active");
             activeButton.getStyleClass().add("button-menu");
         }
 
-        Button clickedButton = (Button) event.getSource();
         clickedButton.getStyleClass().remove("button-menu");
         clickedButton.getStyleClass().add("button-menu-active");
 
@@ -230,17 +300,39 @@ public class DashboardController {
 
     // Метод для установки обработчиков выбора
     private void setupSelectionHandlers() {
-        // Устанавливаем обработчики выбора для каждого ListView
-        dashboardProjectsList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                dashboardTasksList.getSelectionModel().clearSelection();
-            }
-        });
+        // Устанавливаем обработчик только для dashboardProjectsList
+        if (dashboardProjectsList != null && dashboardProjectsList.getSelectionModel() != null) {
+            dashboardProjectsList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    loadTasksForSelectedProject(newSelection);
+                }
+            });
+        }
+    }
 
-        dashboardTasksList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                dashboardProjectsList.getSelectionModel().clearSelection();
-            }
-        });
+    private void showAlertOneButton(String message) {
+        Alert alert = createAlert(Alert.AlertType.WARNING, "Error", null, message);
+
+        // Устанавливаем иконку для окна диалога
+        Image icon = new Image(getClass().getResourceAsStream("/com/example/planify/images/iconWarning.png"));
+        Stage dialogStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(icon);
+
+        // Изменяем текст на кнопках
+        ButtonType cancelButtonType = new ButtonType("Close", ButtonType.CANCEL.getButtonData());
+        alert.getDialogPane().getButtonTypes().setAll(cancelButtonType);
+
+        alert.showAndWait();
+    }
+
+    private Alert createAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        alert.getDialogPane().setGraphic(null);
+
+        return alert;
     }
 }

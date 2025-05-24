@@ -34,6 +34,7 @@ public class Constant {
     public static final String PROJECT_TEAM_ID = "team_id";
     public static final String PROJECT_NAME = "name";
     public static final String PROJECT_STATUS = "status";
+    public static final String CREATION_DATE = "creation_date";
 
     // Tasks table
     public static final String TASK_TABLE = "tasks";

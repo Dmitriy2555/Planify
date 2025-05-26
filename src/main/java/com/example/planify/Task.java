@@ -96,4 +96,9 @@ public class Task {
     public String getAssigneeName() {
         return assignedTo;
     }
+
+    public boolean isOverdue() {
+        LocalDate today = LocalDate.now(); // Текущая дата
+        return deadline != null && deadline.isBefore(today) && !"Completed".equalsIgnoreCase(status);
+    }
 }

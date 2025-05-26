@@ -497,21 +497,46 @@ public class ProjectsController {
             ObservableList<String> taskNames = FXCollections.observableArrayList();
 
             boolean hasTasks = false;
-            for(Task task: tasks)
-            {
-                if("To Do".equalsIgnoreCase(task.getStatus()) || "In Progress".equalsIgnoreCase(task.getStatus()))
-                {
+            for (Task task : tasks) {
+                if ("To Do".equalsIgnoreCase(task.getStatus()) || "In Progress".equalsIgnoreCase(task.getStatus())) {
                     taskNames.add(task.getTitle());
                     hasTasks = true;
-
                 }
             }
 
             if (!hasTasks) {
-                taskNames.add("No tasks available"); // Добавляем сообщение, если нет задач с нужным статусом
+                taskNames.add("No tasks available");
             }
 
-            urgentTasksList.setItems(taskNames); // Обновляем ListView задач
+            urgentTasksList.setItems(taskNames);
+
+            // Настраиваем CellFactory с подсветкой текста
+            urgentTasksList.setCellFactory(param -> new ListCell<String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null || item.equals("No tasks available")) {
+                        setText(item);
+                        setStyle("");
+                    } else {
+                        setText(item);
+
+                        // Находим задачу по её заголовку
+                        Task task = tasks.stream()
+                                .filter(t -> t.getTitle().equals(item))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (task != null) {
+                            if (task.isOverdue()) {
+                                setStyle("-fx-text-fill: #ff6666;"); // Красный текст для просроченных
+                            } else {
+                                setStyle("-fx-text-fill: #b3b300;"); // Жёлтый текст для в процессе
+                            }
+                        }
+                    }
+                }
+            });
         } else {
             System.out.println("Selected project does not exist.");
         }

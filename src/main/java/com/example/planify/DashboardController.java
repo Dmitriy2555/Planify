@@ -274,16 +274,43 @@ public class DashboardController {
             ObservableList<Task> tasks = new DatabaseHandler().loadTasksByProjectId(projectId);
             ObservableList<String> taskNames = FXCollections.observableArrayList();
             if (tasks.isEmpty()) {
-                taskNames.add("No tasks available"); // Добавляем сообщение, если нет задач
-            }
-            else
-            {
+                taskNames.add("No tasks available");
+            } else {
                 for (Task task : tasks) {
                     taskNames.add(task.getTitle());
                 }
             }
 
-            dashboardTasksList.setItems(taskNames); // Обновляем ListView задач
+            dashboardTasksList.setItems(taskNames);
+
+            // Настраиваем CellFactory для цветовой индикации
+            dashboardTasksList.setCellFactory(param -> new ListCell<String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null || item.equals("No tasks available")) {
+                        setText(item);
+                        setStyle("");
+                    } else {
+                        // Находим задачу по её заголовку
+                        Task task = tasks.stream()
+                                .filter(t -> t.getTitle().equals(item))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (task != null) {
+                            setText(item);
+                            if ("Completed".equalsIgnoreCase(task.getStatus())) {
+                                setStyle("-fx-text-fill: #66cc66;");
+                            } else if (task.isOverdue()) {
+                                setStyle("-fx-text-fill: #ff6666;");
+                            } else {
+                                setStyle("-fx-text-fill: #b3b300;");
+                            }
+                        }
+                    }
+                }
+            });
         } else {
             System.out.println("Selected project does not exist.");
         }

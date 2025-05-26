@@ -617,7 +617,8 @@ public class TasksController {
 
         // Название задачи
         Text taskNameText = new Text(taskName);
-        taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-alignment: center;");
+        taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center;");
+        taskNameText.setWrappingWidth(119); // Ограничиваем ширину текста для переноса
 
         // Проверяем, является ли assigneeName числом (ID)
         int idAssignee;
@@ -632,9 +633,22 @@ public class TasksController {
         // Исполнитель и дедлайн
         VBox detailsBox = new VBox(5); // Устанавливаем отступ между элементами в 5 пикселей
         Label assigneeLabel = new Label("Assigned to: " + assigneeName);
-        assigneeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: black;");
         Label deadlineLabel = new Label("Deadline: " + deadline.toString());
-        deadlineLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: black;");
+
+        // Проверяем, просрочена ли задача
+        boolean isOverdue = deadline.isBefore(LocalDate.now());
+
+        // Устанавливаем стиль текста в зависимости от просрочки
+        if (isOverdue) {
+            taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center; -fx-fill: #ff6666;");
+            assigneeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+            deadlineLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+        } else {
+            taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center; -fx-fill: black;");
+            assigneeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+            deadlineLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+        }
+
         detailsBox.getChildren().addAll(assigneeLabel, deadlineLabel);
         detailsBox.setAlignment(Pos.CENTER);
 

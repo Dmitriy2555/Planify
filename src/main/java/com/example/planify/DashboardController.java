@@ -316,15 +316,6 @@ public class DashboardController {
         }
     }
 
-    private int getCreatedTaskActivity(User currentUser)
-    {
-        if (currentUser != null) {
-            DatabaseHandler dbHandler = new DatabaseHandler();
-            return dbHandler.getCreatedTaskCount(currentUser.getId());
-        }
-        return 0;
-    }
-
     // Метод для установки обработчиков выбора
     private void setupSelectionHandlers() {
         // Устанавливаем обработчик только для dashboardProjectsList

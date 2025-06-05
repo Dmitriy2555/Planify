@@ -1021,6 +1021,29 @@ public class DatabaseHandler extends Configuration {
         }
     }
 
+    /**
+     * Получает статус задачи по её названию
+     */
+    public String getTaskStatusByName(String taskName) {
+        String query = "SELECT " + Constant.TASK_STATUS + " FROM " + Constant.TASK_TABLE +
+                " WHERE " + Constant.TASK_TITLE + " = ?";
+
+        try (Connection connection = getDbConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+
+            pstmt.setString(1, taskName);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString(Constant.TASK_STATUS);
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error getting task status for: " + taskName + " - " + e.getMessage());
+        }
+        return "To Do"; // Возвращаем дефолтный статус, если задача не найдена
+    }
+
     // Retrieves the count of tasks created by a specific user.
     public int getCreatedTaskCount(int userId) {
         String query = "SELECT COUNT(*) FROM tasks WHERE created_by = ?";

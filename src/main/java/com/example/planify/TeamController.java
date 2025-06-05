@@ -236,6 +236,9 @@ public class TeamController {
                     // Обновляем объект team
                     team.setName(newName);
 
+                    //успешное редактирование имени команды
+                    showSuccessAlert("Team name changed successfully");
+
                     System.out.println("Team name changed to: " + newName);
                 } else {
                     showAlertOneButton("Team name cannot be empty.");
@@ -722,7 +725,7 @@ public class TeamController {
     }
 
     private void createNewTeam(User currentUser) {
-        TextInputDialog dialog = createTextInputDialog("Создать команду", "Enter the new team name:", "Team name:");
+        TextInputDialog dialog = createTextInputDialog("Create new Team", "Enter the new team name:", "Team name:");
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(teamName -> {
             if (!teamName.trim().isEmpty()) {

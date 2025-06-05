@@ -617,14 +617,17 @@ public class TasksController {
 
         // Название задачи
         Text taskNameText = new Text(taskName);
-        taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center;");
         taskNameText.setWrappingWidth(119); // Ограничиваем ширину текста для переноса
+
+        // Получаем статус задачи из базы данных
+        DatabaseHandler dbHandler = new DatabaseHandler();
+        String status = dbHandler.getTaskStatusByName(taskName);
 
         // Проверяем, является ли assigneeName числом (ID)
         int idAssignee;
         try {
             idAssignee = Integer.parseInt(assigneeName); // Пытаемся преобразовать в число
-            assigneeName = new DatabaseHandler().getUserNameById(idAssignee); // Получаем имя по ID
+            assigneeName = dbHandler.getUserNameById(idAssignee); // Получаем имя по ID
         } catch (NumberFormatException e) {
             // Если преобразование не удалось, предполагаем, что assigneeName уже является именем
             idAssignee = -1; // Устанавливаем недопустимый ID, так как имя уже известно
@@ -635,18 +638,27 @@ public class TasksController {
         Label assigneeLabel = new Label("Assigned to: " + assigneeName);
         Label deadlineLabel = new Label("Deadline: " + deadline.toString());
 
-        // Проверяем, просрочена ли задача
-        boolean isOverdue = deadline.isBefore(LocalDate.now());
-
-        // Устанавливаем стиль текста в зависимости от просрочки
-        if (isOverdue) {
-            taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center; -fx-fill: #ff6666;");
+        // Определяем стиль в зависимости от статуса и просрочки
+        if ("Completed".equalsIgnoreCase(status)) {
+            // Задача выполнена - зеленый цвет, независимо от дедлайна
+            taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center; -fx-fill: #66cc66;");
             assigneeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
             deadlineLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
         } else {
-            taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center; -fx-fill: black;");
-            assigneeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
-            deadlineLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+            // Задача не выполнена - проверяем просрочку
+            boolean isOverdue = deadline.isBefore(LocalDate.now());
+
+            if (isOverdue) {
+                // Просроченная задача - красный цвет
+                taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center; -fx-fill: #ff6666;");
+                assigneeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+                deadlineLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+            } else {
+                // Обычная задача - желтый/оранжевый цвет
+                taskNameText.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-alignment: center; -fx-fill: #b3b300;");
+                assigneeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+                deadlineLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+            }
         }
 
         detailsBox.getChildren().addAll(assigneeLabel, deadlineLabel);

@@ -100,7 +100,7 @@
                   </Label>
                   <Label fx:id="tasksCompletedLabelResultat" layoutX="10.0" layoutY="32.0" styleClass="label-right" stylesheets="@style.css" text="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                   <Label fx:id="overdueTasksLabelResultat" layoutX="160.0" layoutY="32.0" prefHeight="18.0" prefWidth="0.0" styleClass="label-right" stylesheets="@style.css" text="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                  <Label fx:id="tasksCreatedLabelResultat" layoutX="10.0" layoutY="157.0" prefHeight="18.0" prefWidth="0.0" styleClass="label-right" stylesheets="@style.css" text="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                  <Label fx:id="tasksCreatedLabelResultat" layoutX="10.0" layoutY="157.0" prefHeight="18.0" prefWidth="58.0" styleClass="label-right" stylesheets="@style.css" text="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
